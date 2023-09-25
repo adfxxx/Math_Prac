@@ -105,19 +105,19 @@ int flag_e(int number){
             printf("|___________|_______________|\n");
         }
     }
-    
 }
-///**************///
-int flag_a(int number){
-    int answer = 0;
+
+int flag_a (int number) {
+    int result = 0;
+    if (number > 0){
+        result = (number*(number+1))/2;
+        return result;
+    }
     if (number <= 0){
-        printf("Число должно быть больше 0");
-    }
-    else {
-        printf("%d", (number*(number+1))/2);
+        return 0;
     }
 }
-///**************///
+
 int flag_f(unsigned long long number){
     unsigned long long total = 1;
     for (int i = 1; i <= number; ++i){
@@ -167,7 +167,11 @@ int main(int argc, char *argv[]){
             flag_e(number);
             break;
         case 'a':
-            flag_a(number);
+            if (!flag_a(number)){
+                printf("above zero");
+            }
+            else {printf("%d", flag_a(number));}
+            break;
         case 'f':
             if (number < 0){
                 printf("Число должно быть больше или равно 0");
