@@ -19,7 +19,7 @@ int flag_check(char *flag){
 
     return 0;
 }
-///**************///
+
 int number_check(char *number){
     if (strlen(number) == 1){
         if (*number == '-'){
@@ -31,7 +31,7 @@ int number_check(char *number){
     }
     else{return 0;}
 }
-///**************///
+
 int flag_h(int number){
     int status = 0;
     if (number <= 0 || number > 100) {
@@ -48,7 +48,7 @@ int flag_h(int number){
     }
     
 }
-///**************///
+
 int flag_p(int number){
     if (number >= 2){
         for (int i = 2; i < number; ++i ){
@@ -63,7 +63,7 @@ int flag_p(int number){
     }
     else { return -1; }
 }
-///**************///
+
 int flag_s(char *number){
     int position = 0;
     if (number[0] == '-'){
@@ -78,8 +78,8 @@ int flag_s(char *number){
         printf("%c ", number[i]);
     }
 }
-///**************///
-int calculations_for_e(int num, int pow){
+
+long long int calculations_for_e(int num, int pow){
     long long int total = num;
     for (int i = 1; i < pow; ++i){
         total *= num;
@@ -118,14 +118,22 @@ int flag_a (int number) {
     }
 }
 
-int flag_f(unsigned long long number){
-    unsigned long long total = 1;
-    for (int i = 1; i <= number; ++i){
-        total *= i;
+long long int flag_f(long long int number){
+    long long int total = 1;
+    if (number > 20 || number < 0){
+        return 0;
     }
-    printf("%llu", total);
+    else if (number == 0){
+        return 1;
+    }
+    else{
+        for (int i = 1; i <= number; ++i){
+            total *= i;
+        }
+        return total;
+    }
 }
-///**************///
+
 int main(int argc, char *argv[]){
     setlocale (LC_ALL, "rus");
 
@@ -168,19 +176,18 @@ int main(int argc, char *argv[]){
             break;
         case 'a':
             if (!flag_a(number)){
-                printf("above zero");
+                printf("Число должно быть больше 0.");
             }
             else {printf("%d", flag_a(number));}
             break;
         case 'f':
-            if (number < 0){
-                printf("Число должно быть больше или равно 0");
+            if (flag_f(number) == 0){
+                printf("Число должно быть от 1 до 20 включительно");
             }
-            else if (number == 0){
+            else if(flag_f(number) == 1){
                 printf("%d", 1);
             }
-            else {flag_f(number);}
+            else {printf("%lli", flag_f(number));}
     }
-
     return 0;
 }
