@@ -12,7 +12,7 @@ int number_check(char *l){
     else{return 0;}
 }
 
-long double fac(int n) {
+double fac(int n) {
 	if (n == 0) { return 1; }
 	if (n > 0) { return n * fac(n - 1); }
 }
