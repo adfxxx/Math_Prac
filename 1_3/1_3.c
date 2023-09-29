@@ -191,11 +191,11 @@ int main(int argc, char *argv[]){
                 printf ("Необходимо ввести неотрицательное значение точности и три неотрицательных вещественных числа");
                 return 0;
             }
-            double point_t = atoi(argv[2]);
+            double point_t = atof(argv[2]);
             double eps_2 = pow(10, -point_t);
-            double side_1 = atoi(argv[3]);
-            double side_2 = atoi(argv[4]);
-            double side_3 = atoi(argv[5]);
+            double side_1 = atof(argv[3]);
+            double side_2 = atof(argv[4]);
+            double side_3 = atof(argv[5]);
             if (!flag_t(eps_2, side_1, side_2, side_3)){
                 printf ("Числа не являются длинами сторон прямоугольного треугольника");
             }

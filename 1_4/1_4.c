@@ -26,13 +26,11 @@ int flag_check(char *flag){
     return 0;
 }
 
-char* output_name (char *input, int length, char *end, int length_end){
-    char *result = malloc(length_end + length + 1);
+void output_name (char *input, int length, char *end, int length_end, char **output){
+    *output = (char*)malloc(sizeof(char)*(length_end + length + 1));
 
-    memcpy(result, end, length_end);
-    memcpy(result + length_end, input, length+1);
-
-    return result;
+    memcpy(*output, end, length_end);
+    memcpy(*output + length_end, input, length+1);
 }
 
 void flag_d (FILE *input, FILE *output){
@@ -101,7 +99,7 @@ void flag_a(FILE *input, FILE *output){
 
 int main (int argc, char *argv[]){
     char flag;
-    char *output;
+    char *output = NULL;
     if (argc > 4 || argc < 3){
         printf ("Input must be like: nflag input_file or flag input_file output_file");
         return 0;
@@ -122,7 +120,7 @@ int main (int argc, char *argv[]){
             char *end= "out_";
             int length_end = strlen(end);
             int length = strlen(input);
-            output = output_name(input, length, end, length_end);
+            output_name(input, length, end, length_end, &output);
             flag = argv[1][1];
         }
         else{
@@ -145,20 +143,30 @@ int main (int argc, char *argv[]){
         case 'd':
             flag_d(input_file, output_file);
             printf("Sucessful output");
+            free(output);
+            fclose(input_file);
+            fclose(output_file);
             break;
         case 'i':
             flag_i(input_file, output_file);
             printf("Sucessful output");
+            free(output);
+            fclose(input_file);
+            fclose(output_file);
             break;
         case 's':
             flag_s(input_file, output_file);
             printf("Sucessful output");
+            free(output);
+            fclose(input_file);
+            fclose(output_file);
             break;
         case 'a':
             flag_a(input_file, output_file);
             printf("Sucessful output");
+            free(output);
+            fclose(input_file);
+            fclose(output_file);
             break;
     }
-    fclose(input_file);
-    fclose(output_file);
 }
