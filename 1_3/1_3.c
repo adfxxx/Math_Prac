@@ -23,8 +23,8 @@ int number_check(char *number){
     int length = strlen(number);
     int dot_count = 0;
     for (int i = 0; i < length; ++i){
-        if ((number[i] >= '0' && number[i] <= '9') || number[i] == ',' || number[i] == '-'){
-            if (number[i] == ','){
+        if ((number[i] >= '0' && number[i] <= '9') || number[i] == '.' || number[i] == '-'){
+            if (number[i] == '.'){
                 dot_count += 1;
             }
         }
