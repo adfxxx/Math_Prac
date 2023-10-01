@@ -27,10 +27,29 @@ int flag_check(char *flag){
 }
 
 void output_name (char *input, int length, char *end, int length_end, char **output){
+    int position;
+    char *end_input;
+    for (int i = length; i > 0 ; --i){
+        if (input[i] == '\\'){
+            position = i + 1;
+            break;
+        }
+    }
+    end_input = (char*)malloc(sizeof(char)*(length-position));
+    int k = 0;
+    for (int i = position; i <= length; ++i){
+        end_input[k] = input[i];
+        k++;
+    }
+
     *output = (char*)malloc(sizeof(char)*(length_end + length + 1));
 
-    memcpy(*output, end, length_end);
-    memcpy(*output + length_end, input, length+1);
+    memcpy(*output, input, position);
+    memcpy(*output + position, end, length_end);
+    memcpy(*output + length_end + position, end_input, length-position+2);
+    for (int i = 0; i < strlen(end_input); i++){
+        free(&end_input[i]);
+    }
 }
 
 void flag_d (FILE *input, FILE *output){
@@ -74,8 +93,8 @@ void flag_s (FILE *input, FILE *output){
             }
         }
         else{
-            fputs ("Number ", output);
-            fprintf(output, "%d\n", count);
+            //fputs ("Number ", output);
+            fprintf(output, "Number: %d\n", count);
             count = 0;
         }
     }
@@ -121,6 +140,7 @@ int main (int argc, char *argv[]){
             int length_end = strlen(end);
             int length = strlen(input);
             output_name(input, length, end, length_end, &output);
+            printf("%s\n", output);
             flag = argv[1][1];
         }
         else{
@@ -137,36 +157,32 @@ int main (int argc, char *argv[]){
     FILE *output_file = fopen(output, "w");
     if (!output_file){
         printf ("Output_file is not open");
+        fclose(input_file);
         return 0;
     }
     switch (flag){
         case 'd':
             flag_d(input_file, output_file);
             printf("Sucessful output");
-            free(output);
-            fclose(input_file);
-            fclose(output_file);
             break;
         case 'i':
             flag_i(input_file, output_file);
             printf("Sucessful output");
-            free(output);
-            fclose(input_file);
-            fclose(output_file);
             break;
         case 's':
             flag_s(input_file, output_file);
             printf("Sucessful output");
-            free(output);
-            fclose(input_file);
-            fclose(output_file);
             break;
         case 'a':
             flag_a(input_file, output_file);
             printf("Sucessful output");
-            free(output);
-            fclose(input_file);
-            fclose(output_file);
             break;
     }
+    //for (int i = 0; i < strlen(output); i++){
+    //    free(&output[i]);
+    //}
+    free(output);
+    fclose(input_file);
+    fclose(output_file);
+    return 0;
 }

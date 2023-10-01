@@ -202,4 +202,5 @@ int main(int argc, char *argv[]){
             else {printf ("„исла €вл€ютс€ длинами сторон пр€моугольного треугольника");}
             break;
     }
+    return 0;
 }

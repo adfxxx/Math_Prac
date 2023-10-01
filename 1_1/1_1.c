@@ -21,15 +21,20 @@ int flag_check(char *flag){
 }
 
 int number_check(char *number){
-    if (strlen(number) == 1){
-        if (*number == '-'){
-            return 0;
+    int length = strlen(number);//можно убрать
+    int dot_count = 0;
+    for (int i = 0; i < length; ++i){
+        if ((number[i] >= '0' && number[i] <= '9') || number[i] == '.' || number[i] == '-'){
+            if (number[i] == '.'){
+                dot_count += 1;
+            }
+        }
+        else{ return 0; }
     }
+    if (dot_count != 0){
+        return 0;
     }
-    if(sscanf (number, "%d", &number)){
-        return 1;
-    }
-    else{return 0;}
+    return 1;
 }
 
 int flag_h(int number){
@@ -127,7 +132,7 @@ long long int flag_f(long long int number){
         return 1;
     }
     else{
-        for (int i = 1; i <= number; ++i){
+        for (int i = 2; i <= number; ++i){
             total *= i;
         }
         return total;
@@ -139,7 +144,7 @@ int main(int argc, char *argv[]){
 
     if (argc != 3){
         printf ("Необходимо ввести два аргумента.");
-        return 0;
+        return 1;
     }
 
     if (!number_check(argv[1])){
@@ -188,6 +193,7 @@ int main(int argc, char *argv[]){
                 printf("%d", 1);
             }
             else {printf("%lli", flag_f(number));}
+            break;
     }
     return 0;
 }

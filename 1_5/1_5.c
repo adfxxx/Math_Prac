@@ -128,4 +128,5 @@ int main(int argc, char *argv[]){
     else{
         printf("Result of d: %.10f\n", function_d(eps, x));
     }
+    return 0;
 }

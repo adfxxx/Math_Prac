@@ -1,15 +1,29 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include <locale.h>
 
 #define pi 3.14
 
-int number_check(char *l){
-    if(sscanf (l, "%d", &l)){
-        return 1;
+int number_check(char *number){
+    if (number[0] == '-'){
+        return 0;
     }
-    else{return 0;}
+    int length = strlen(number);
+    int dot_count = 0;
+    for (int i = 0; i < length; ++i){
+        if ((number[i] >= '0' && number[i] <= '9') || number[i] == '.'){
+            if (number[i] == '.'){
+                dot_count += 1;
+            }
+        }
+        else{ return 0; }
+    }
+    if (dot_count != 0){
+        return 0;
+    }
+    return 1;
 }
 
 double fac(int n) {
@@ -288,4 +302,5 @@ int main (int argc, char *argv[]){
     printf("gamma limit: %.*lf\n", 8, gamma_lim(eps));
     printf("gamma row: %.*lf\n", 8, gamma_row(eps));
     printf("gamma function: %.*lf\n", 8, gamma_newton(eps));
+    return 0;
 }
