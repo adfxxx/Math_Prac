@@ -27,7 +27,7 @@ int flag_check(char *flag){
 }
 
 void output_name (char *input, int length, char *end, int length_end, char **output){
-    int position;
+    int position = 0;
     char *end_input;
     for (int i = length; i > 0 ; --i){
         if (input[i] == '\\'){
@@ -35,20 +35,23 @@ void output_name (char *input, int length, char *end, int length_end, char **out
             break;
         }
     }
-    end_input = (char*)malloc(sizeof(char)*(length-position));
-    int k = 0;
-    for (int i = position; i <= length; ++i){
-        end_input[k] = input[i];
-        k++;
-    }
-
     *output = (char*)malloc(sizeof(char)*(length_end + length + 1));
+    if (position == 0){
+        memcpy(*output, end, length_end);
+        memcpy(*output + length_end, input, length+1);
+    }
+    else{
+        end_input = (char*)malloc(sizeof(char)*(length-position));
+        int k = 0;
+        for (int i = position; i <= length; ++i){
+            end_input[k] = input[i];
+            k++;
+        }
 
-    memcpy(*output, input, position);
-    memcpy(*output + position, end, length_end);
-    memcpy(*output + length_end + position, end_input, length-position+2);
-    for (int i = 0; i < strlen(end_input); i++){
-        free(&end_input[i]);
+        memcpy(*output, input, position);
+        memcpy(*output + position, end, length_end);
+        memcpy(*output + length_end + position, end_input, length-position+2);
+        free(end_input);
     }
 }
 
@@ -125,9 +128,9 @@ int main (int argc, char *argv[]){
     }
     char *input = argv[2];
     if (argc == 4){
-        if (flag_check(argv[1]) == 2){
+        if (flag_check(argv[1]) == 1){
             output = argv[3];
-            flag = argv[1][2];
+            flag = argv[1][1];
         }
         else {
             printf ("Wrong flag");
@@ -135,13 +138,12 @@ int main (int argc, char *argv[]){
         }
     }
     if (argc == 3){
-        if (flag_check(argv[1]) == 1){
+        if (flag_check(argv[1]) == 2){
             char *end= "out_";
             int length_end = strlen(end);
             int length = strlen(input);
             output_name(input, length, end, length_end, &output);
-            printf("%s\n", output);
-            flag = argv[1][1];
+            flag = argv[1][2];
         }
         else{
             printf ("Wrong flag");
@@ -160,6 +162,7 @@ int main (int argc, char *argv[]){
         fclose(input_file);
         return 0;
     }
+
     switch (flag){
         case 'd':
             flag_d(input_file, output_file);
