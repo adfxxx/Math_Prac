@@ -223,10 +223,13 @@ double gamma_row(double eps){
 }
 
 double prime (int p) {
-    if (p <= 1){
+    if (p == 0 || p == 1){
         return 0;
     }
-    for (int i = 2; i < p; ++i) {
+    if (p == 2){
+        return 1;
+    }
+    for (int i = 2; i <= (int)sqrt(p); ++i) {
         if (p % i == 0){
             return 0;
         }
@@ -245,6 +248,7 @@ double multip (double t) {
 }
 
 double gam_lim (double eps){
+    eps = 0.0001;
     int t = 2;
     double result_1 = 0;
     double result_2 = 0;
@@ -258,16 +262,15 @@ double gam_lim (double eps){
 }
 
 double gamma_newton(double eps){
-    double a = 0;
-    double b = 1;
-    double result = (a+b)/2;
-    double x = (exp(-result) - gam_lim(result))/exp(-result);
-    while (fabs(result - x) > eps){
-        result = x;
-        x = (exp(-result) - gam_lim(result))/exp(-result);
-    }
-    return x;
+    double result_1 = 1;
+    double result_2 = 1;
+    do{
+        result_1 = (exp(-result_2) - gam_lim(eps))/exp(-result_2);
+        result_2 += result_1;
+    }while (fabs(result_1) > eps);
+    return result_2;
 }
+
 
 int main (int argc, char *argv[]){
     setlocale (LC_ALL, "rus");
