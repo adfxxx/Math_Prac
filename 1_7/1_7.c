@@ -39,7 +39,7 @@ void get_file(FILE *file, char **list, int length){
     (*list) = list_temp;
     while(!feof(file)){
         symbol = fgetc(file);
-        if (symbol != ',' && symbol != '.' && symbol != EOF && symbol != '\0'){
+        if (symbol != ',' && symbol != '.' && symbol != ' ' && symbol != '\0'){
             (*list)[i] = symbol;
             i++;
         }
@@ -62,36 +62,88 @@ void flag_r (FILE *file_1, FILE *file_2, FILE *file_out){
     int k = 0;
     if (length_1 > length_2){
         for(int i = 0; i < length_1; ++i){
-            while(list_1[j] != ' ' && list_1[j] != '\0'){
+            while(list_1[j] != ' ' && j < length_1){
                 fprintf(file_out, "%c", list_1[j]);
                 j++;
             }
-            printf("\n");
-            while(list_2[k] != ' '  && list_2[k] != '\0'){
-                if (k < length_2){
-                    fprintf(file_out, "%c", list_2[k]);
-                    k++;
-                }
-            }
-            k++;
             j++;
-        }    
-    }
-    else{
-       for(int i = 0; i < length_2; ++i){
-            while(list_1[j] != ' ' && list_1[j] != '\0'){
-                if (j < length_1){
-                    fprintf(file_out, "%s", list_1[j]);
-                    j++;
-                }
-            }
-            while(list_2[k] != ' ' && list_2[k] != '\0'){
-                fprintf(file_out, "%s", list_2[k]);
+            fprintf(file_out, " ");
+            while(list_2[k] != ' ' && k < length_2){
+                fprintf(file_out, "%c", list_2[k]);
                 k++;
             }
             k++;
-            j++;
+            if (k <= length_2+1){
+                fprintf(file_out, " ");
+            }
+            if (j >= length_1){
+                break;
+            }
         }    
+        free(list_1);
+        free(list_2);
+    }
+    else{
+       for(int i = 0; i < length_2; ++i){
+            while(list_1[j] != ' ' && j < length_1){
+                fprintf(file_out, "%c", list_1[j]);
+                j++;
+            }
+            j++;
+            fprintf(file_out, " ");
+            while(list_2[k] != ' ' && k < length_2){
+                fprintf(file_out, "%c", list_2[k]);
+                k++;
+            }
+            k++;
+            if (j <= length_1+1){
+                fprintf(file_out, " ");
+            }
+            if (k >= length_2){
+                break;
+            }
+        }  
+    }
+}
+
+int to_base_4(int number){
+    int answer = 0;
+    while (number != 0){
+        answer = answer + (number % 4);
+        number /= 4;
+        answer *= 10;
+    }
+    int total = 0;
+    while (answer != 0){
+        total = total*10 + (answer % 10);
+        answer /= 10;
+    }
+    return total;
+}
+
+void flag_a (FILE* file, FILE* file_out){
+    int length = get_file_length(file);
+    char *list = NULL;
+    get_file(file, &list, length);
+    int count = 0;
+    char symbol;
+    for (int i = 0; i < length; ++i){
+        if (count == 9){
+            while (list[i] != ' ' && i < length){
+                symbol = tolower(list[i]);
+                int ascii = symbol;
+                fprintf(file_out, "%d", to_base_4(ascii));
+                i++;
+            }
+            fprintf(file_out, " ");
+        }
+        if (list[i] == ' '){
+            count++;
+            fprintf(file_out, " ");
+        }
+        else if (i < length){
+            fprintf(file_out, "%c", list[i]);
+        }
     }
 }
 
@@ -122,20 +174,20 @@ int main(int argc, char *argv[]){
             printf("Success");
             break;
 
-        // case 'a':
-        //     if(argc != 4){
-        //         printf("Wrong amount of arguments");
-        //         return wrong_amount;
-        //     }
-        //     FILE *file = fopen(argv[2], "r");
-        //     FILE *file_out = fopen(argv[3], "w");
-        //     if(!file|| !file_out){
-        //         printf("File is not open");
-        //         return not_open;
-        //     }
-        //     flag_a(file, file_out);
-        //     printf("Success");
-        //     break;
+        case 'a':
+            if(argc != 4){
+                printf("Wrong amount of arguments");
+                return wrong_amount;
+            }
+            FILE *file = fopen(argv[2], "r");
+            FILE *out_file = fopen(argv[3], "w");
+            if(!file|| !out_file){
+                printf("File is not open");
+                return not_open;
+            }
+            flag_a(file, out_file);
+            printf("Success");
+            break;
 
     }
     return 0;
