@@ -34,16 +34,15 @@ long get_file_length(FILE *file){
 
 void get_file(FILE *file, char **list, int length){
     int i = 0;
-    char symbol;
+    char symbol = 0;
     char *list_temp = malloc(sizeof(char)*length);
     (*list) = list_temp;
-    while(!feof(file)){
-        symbol = fgetc(file);
-        if (symbol != ',' && symbol != '.' && symbol != ' ' && symbol != '\0'){
+    while((symbol = fgetc(file)) != EOF){
+        if (symbol != ',' && symbol != '.' && symbol != ' ' && symbol != '\0' && symbol != '\n'){
             (*list)[i] = symbol;
             i++;
         }
-        else{
+        else if ((*list)[i-1] != ' ' && i < length){
             (*list)[i] = ' ';
             i++;
         }
@@ -73,10 +72,10 @@ void flag_r (FILE *file_1, FILE *file_2, FILE *file_out){
                 k++;
             }
             k++;
-            if (k <= length_2+1){
+            if (k < length_2){
                 fprintf(file_out, " ");
             }
-            if (j >= length_1){
+            if (j > length_1){
                 break;
             }
         }    
@@ -96,13 +95,15 @@ void flag_r (FILE *file_1, FILE *file_2, FILE *file_out){
                 k++;
             }
             k++;
-            if (j <= length_1+1){
+            if (j < length_1){
                 fprintf(file_out, " ");
             }
-            if (k >= length_2){
+            if (k > length_2){
                 break;
             }
-        }  
+        }
+        free(list_1);
+        free(list_2);  
     }
 }
 
@@ -123,28 +124,49 @@ int to_base_4(int number){
 
 void flag_a (FILE* file, FILE* file_out){
     int length = get_file_length(file);
+    printf("%d\n", length);
     char *list = NULL;
     get_file(file, &list, length);
-    int count = 0;
-    char symbol;
     for (int i = 0; i < length; ++i){
-        if (count == 9){
+        printf("%c", list[i]);
+    }
+    printf("\n");
+    int count = 1;
+    char symbol = 0;
+    for (int i = 0; i < length; ++i){
+        if (count % 10 == 0){
             while (list[i] != ' ' && i < length){
                 symbol = tolower(list[i]);
                 int ascii = symbol;
                 fprintf(file_out, "%d", to_base_4(ascii));
                 i++;
             }
-            fprintf(file_out, " ");
+            fputc(' ', file_out);
         }
-        if (list[i] == ' '){
+        if (count % 2 == 0 && count % 10 != 0){
+            while (list[i] != ' ' && i < length){
+                fprintf(file_out, "%c", tolower(list[i]));
+                i++;
+            }
+            fputc(' ', file_out);
+        }
+        if (count % 5 == 0 && count % 10 != 0){
+            while (list[i] != ' ' && i < length){
+                int ascii = list[i];
+                fprintf(file_out, "%o", ascii);
+                i++;
+            }
+            fputc(' ', file_out);
+        }
+        if (list[i] == ' ' && list[i-1] != ' '){
             count++;
-            fprintf(file_out, " ");
+            fputc(' ', file_out);
         }
         else if (i < length){
             fprintf(file_out, "%c", list[i]);
         }
     }
+    free(list);
 }
 
 int main(int argc, char *argv[]){
@@ -172,6 +194,9 @@ int main(int argc, char *argv[]){
             }
             flag_r(file_1, file_2, file_out);
             printf("Success");
+            fclose(file_1);
+            fclose (file_2);
+            fclose (file_out);
             break;
 
         case 'a':
@@ -187,8 +212,9 @@ int main(int argc, char *argv[]){
             }
             flag_a(file, out_file);
             printf("Success");
+            fclose (file);
+            fclose (out_file);
             break;
-
     }
     return 0;
 }
