@@ -7,8 +7,7 @@
 enum errors{
     success = 1,
     wrong_amount = -1,
-    wrong_input = -2,
-    not_open = -3
+    wrong_input = -2
 };
 
 void fill_random (int *numbers, int a, int b, int length){
@@ -69,10 +68,10 @@ int main(int argc, char *argv[]){
         return wrong_amount;
     }
 
-    // if (!isdigit(argv[1]) || !isdigit(argv[2]) || !isdigit(argv[3])){
-    //     printf ("Input = numbers");
-    //     return wrong_input;
-    // }
+    if (!isdigit(*argv[1]) || !isdigit(*argv[2]) || !isdigit(*argv[3])){
+        printf ("Input = numbers");
+        return wrong_input;
+    }
 
     int length = atoi(argv[1]);
     int a = atoi(argv[2]);
