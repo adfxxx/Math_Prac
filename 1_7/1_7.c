@@ -124,13 +124,8 @@ int to_base_4(int number){
 
 void flag_a (FILE* file, FILE* file_out){
     int length = get_file_length(file);
-    printf("%d\n", length);
     char *list = NULL;
     get_file(file, &list, length);
-    for (int i = 0; i < length; ++i){
-        printf("%c", list[i]);
-    }
-    printf("\n");
     int count = 1;
     char symbol = 0;
     for (int i = 0; i < length; ++i){
