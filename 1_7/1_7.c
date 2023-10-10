@@ -61,21 +61,21 @@ void flag_r (FILE *file_1, FILE *file_2, FILE *file_out){
     int k = 0;
     if (length_1 > length_2){
         for(int i = 0; i < length_1; ++i){
-            while(list_1[j] != ' ' && j < length_1){
+            while(list_1[j] != ' ' && j < length_1-1){
                 fprintf(file_out, "%c", list_1[j]);
                 j++;
             }
             j++;
             fprintf(file_out, " ");
-            while(list_2[k] != ' ' && k < length_2){
+            while(list_2[k] != ' ' && k < length_2-1){
                 fprintf(file_out, "%c", list_2[k]);
                 k++;
             }
             k++;
-            if (k < length_2){
+            if (k < length_2 - 1){
                 fprintf(file_out, " ");
             }
-            if (j > length_1){
+            if (j >= length_1){
                 break;
             }
         }    
@@ -84,21 +84,21 @@ void flag_r (FILE *file_1, FILE *file_2, FILE *file_out){
     }
     else{
        for(int i = 0; i < length_2; ++i){
-            while(list_1[j] != ' ' && j < length_1){
+            while(list_1[j] != ' ' && j < length_1-1){
                 fprintf(file_out, "%c", list_1[j]);
                 j++;
             }
             j++;
             fprintf(file_out, " ");
-            while(list_2[k] != ' ' && k < length_2){
+            while(list_2[k] != ' ' && k < length_2-1){
                 fprintf(file_out, "%c", list_2[k]);
                 k++;
             }
             k++;
-            if (j < length_1){
+            if (j < length_1 - 1){
                 fprintf(file_out, " ");
             }
-            if (k > length_2){
+            if (k >= length_2){
                 break;
             }
         }

@@ -69,7 +69,7 @@ int main (){
         printf("System must be a number between 2 and 36");
         return wrong_input;
     }
-    char element[128] = {0};
+    char element[30] = {0};
     int length = 0;
     int max_element = 0;
     int elem = 0;
