@@ -38,7 +38,10 @@ int transform (int length, char *number, int base, int k){
     int total = 0;
     int temp = 0;
     for(int i = k; i < length; ++i){
-        if(isdigit(number[i])){
+        if(number[i] == ' ' || number[i] == '\0' || number[i] == '\n'){
+            break;
+        }
+        else if(isdigit(number[i])){
             temp = number[i] - '0';
             total += (temp*pow(base, length - i - 1));
         }
@@ -60,6 +63,9 @@ int function (FILE* file, FILE* out_file){
     int result = 0;
     char *number = malloc(length);
     int k = 0;
+    if(!isdigit(list[0]) && !isalpha(list[0])){
+        return success;
+    }
     for (int i = 0; i < length; ++i){
         while(list[i] != ' ' && i < length){
             if (isdigit(list[i])){
@@ -78,12 +84,15 @@ int function (FILE* file, FILE* out_file){
             i++;
         }
         result = transform(count, number, base, k);
-        for(int i = k; i < count; ++i){
-            fprintf(out_file,"%c", number[i]);
+        if (result != 0){
+            for(int i = k; i < count; ++i){
+                fprintf(out_file,"%c", number[i]);
+            }
+            fprintf(out_file, " %d %d\n", base, result);
         }
-        fprintf(out_file, " %d %d\n", base, result);
         k = count+1;
         count++;
+        base = 0;
     }
     free(list);
     free(number);

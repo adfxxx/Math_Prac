@@ -169,7 +169,7 @@ int main(int argc, char *argv[]){
         printf("Wrong amount of arguments");
         return wrong_amount;
     }
-    if(!flag_check(argv[1])){
+    if(flag_check(argv[1]) == wrong_flag){
         printf("Wrong flag");
         return wrong_flag;
     }
