@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 enum errors{
     success = 1,
@@ -61,6 +62,16 @@ void fill_arr_c (int *arr_a, int *arr_b, int *arr_c, int length_a, int length_b)
     }
 }
 
+int check_digit (char *number){
+    int length = strlen(number);
+    for (int i = 0; i < length; ++i){
+        if(!(number[i] >= 0 && number[i] <= '9') && number[i] !='-'){
+            return wrong_input;
+        }
+    }
+    return success;
+}
+
 int main(int argc, char *argv[]){
     srand(time(NULL));
     if (argc != 4){
@@ -68,7 +79,7 @@ int main(int argc, char *argv[]){
         return wrong_amount;
     }
 
-    if (!isdigit(*argv[1]) || !isdigit(*argv[2]) || !isdigit(*argv[3])){
+    if (check_digit(argv[1]) != success || check_digit(argv[2]) != success || check_digit(argv[3]) != success){
         printf ("Input = numbers");
         return wrong_input;
     }
@@ -77,6 +88,12 @@ int main(int argc, char *argv[]){
     int a = atoi(argv[2]);
     int b = atoi(argv[3]);
     int *numbers = malloc(sizeof(int)*length);
+
+    if(a > b){
+        int temp = b;
+        b = a;
+        a = temp;
+    }
 
     fill_random(numbers, a, b, length);
     printf ("Original array: ");
@@ -90,9 +107,9 @@ int main(int argc, char *argv[]){
     }
     free(numbers);
 
-    int length_a = get_random_num(10, 10000);
+    int length_a = 5;//get_random_num(10, 10000);
     int *arr_a = malloc(sizeof(int)*length_a);
-    int length_b = get_random_num(10, 10000);
+    int length_b = 3;//get_random_num(10, 10000);
     int *arr_b = malloc(sizeof(int)*length_b);
     int *arr_c = malloc(sizeof(int)*length_a);
 

@@ -56,17 +56,17 @@ int transform (int length, char *number, int base, int k){
 
 int function (FILE* file, FILE* out_file){
     int length = get_file_length(file);
-    char *list = malloc(length);
+    char *list = malloc(sizeof(char)*length);
     get_file(file, list, length);
     int base = 0;
     int count = 0;
     int result = 0;
-    char *number = malloc(length);
+    char *number = malloc(sizeof(char)*length);
     int k = 0;
     if(!isdigit(list[0]) && !isalpha(list[0])){
         return success;
     }
-    for (int i = 0; i < length; ++i){
+    for (int i = k; i < length; ++i){
         while(list[i] != ' ' && i < length){
             if (isdigit(list[i])){
                 if (list[i] - '0' + 1 > base){
@@ -84,11 +84,24 @@ int function (FILE* file, FILE* out_file){
             i++;
         }
         result = transform(count, number, base, k);
-        if (result != 0){
-            for(int i = k; i < count; ++i){
-                fprintf(out_file,"%c", number[i]);
+        if(number[k] == '0'){
+            while (number[k] == '0' && k < count-1){
+                k++;
             }
-            fprintf(out_file, " %d %d\n", base, result);
+        }
+        if (result != 0 || number[k] == '0'){
+            if (number[k] == '0'){
+                for(int i = k; i < count; ++i){
+                    fprintf(out_file,"%c", number[i]);
+                }
+                fprintf(out_file, " %d %d\n", base+1, result);
+            }
+            else{
+                for(int i = k; i < count; ++i){
+                    fprintf(out_file,"%c", number[i]);
+                }
+                fprintf(out_file, " %d %d\n", base, result);
+            }
         }
         k = count+1;
         count++;

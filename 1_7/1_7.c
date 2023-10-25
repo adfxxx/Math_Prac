@@ -184,6 +184,9 @@ int main(int argc, char *argv[]){
             FILE *file_2 = fopen(argv[3], "r");
             FILE *file_out = fopen(argv[4], "w");
             if(!file_1 || !file_2 || !file_out){
+                fclose(file_1);
+                fclose (file_2);
+                fclose (file_out);
                 printf("File is not open");
                 return not_open;
             }
@@ -202,6 +205,8 @@ int main(int argc, char *argv[]){
             FILE *file = fopen(argv[2], "r");
             FILE *out_file = fopen(argv[3], "w");
             if(!file|| !out_file){
+                fclose (file);
+                fclose (out_file);
                 printf("File is not open");
                 return not_open;
             }

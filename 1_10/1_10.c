@@ -9,13 +9,19 @@ enum errors{
     wrong_input = -2
 };
 
-int find_max (int length, char *element, int base){
+int to_10 (int length, char *element, int base){
     int num = 0;
     int temp = 0;
     if(!strcmp(element, "Stop")){
         return num;
     }
-    for(int i = 0; i < length; ++i){
+    int count = 0;
+    for (int i = 0; i < length; i++){
+        while (element[i] == 0){
+            count += 1;
+        }
+    }
+    for(int i = count; i < length; ++i){
         if(isdigit(element[i])){
             temp = element[i] - '0';
             num += (temp*pow(base, length - i - 1));
@@ -47,7 +53,7 @@ int to_18_36_base(int number, char *answer, int base){
     int i = 0;
     while (number != 0){
         if (number % base >= 10){
-            answer[i] = (number % base) % 10 + 'A';
+            answer[i] = (number % base) % 10 + 'a';
         }
         else{
             answer[i] = (number % base) + '0';
@@ -56,6 +62,23 @@ int to_18_36_base(int number, char *answer, int base){
         i++;
     }
     return i;
+}
+
+int check_elem(char *elem, int base){
+    int length = strlen(elem);
+    for (int i = 0; i < length; ++i){
+        if(isalpha(elem[i])){
+            if(tolower(elem[i]) - 'a' + 10 >= base){
+                return -1;
+            }
+        }
+        if(isdigit(elem[i])){
+            if(tolower(elem[i]) - '0' >= base){
+                return -1;
+            }
+        }
+    }
+    return 1;
 }
 
 int main (){
@@ -77,19 +100,31 @@ int main (){
     printf("Write numbers (Stop = end)\n");
     do{
         scanf("%s", &element);
+        if(check_elem(element, base) == -1){
+            continue;
+        }
         length = strlen(element);
-        elem = find_max(length, element, base);
+        elem = to_10(length, element, base);
         if (elem > max_element){
             max_element = elem;
             size = length;
         }
     } while(strcmp(element, "Stop"));
-    printf("\nMax number %d", max_element);
+    if (max_element == 0){
+        printf("There are no good numbers");
+        return wrong_input;
+    }
+    char *orig_elem = malloc(sizeof(char)*size);
+    int count = to_18_36_base(max_element, orig_elem, base);
+    printf("\nMax number %d - ", max_element);
+    for (int i = count-1; i >= 0; --i){
+        printf("%c", orig_elem[i]);
+    }
 
     printf("\nMax number in 9: %d\n", to_9_base(max_element));
 
     char *answer_18 = malloc(sizeof(char)*size);
-    int count = to_18_36_base(max_element, answer_18, 18);
+    count = to_18_36_base(max_element, answer_18, 18);
     printf("Max number in 18: ");
     for (int i = count-1; i >= 0; --i){
         printf("%c", answer_18[i]);
