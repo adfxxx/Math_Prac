@@ -27,8 +27,12 @@ int main(){
 
 void polynom(double eps, int a, double **result, int power, ...){
     *result = (double*)malloc((power+1)*sizeof(double));
-    double *coeffs = (double*)malloc((power)*sizeof(double));
     if(*result == NULL){
+        print(memory_error);
+        return;
+    }
+    double *coeffs = (double*)malloc((power)*sizeof(double));
+    if(coeffs == NULL){
         print(memory_error);
         return;
     }
@@ -41,12 +45,16 @@ void polynom(double eps, int a, double **result, int power, ...){
     }
     double sum = 0.0;
     for(int i = 0; i < power; i++){
-        sum += (coeffs[i]*pow(a, power - i));
+        sum += (coeffs[i]*pow(a, power - i));    
     }
     sum += va_arg(coefs, double);
     (*result)[0] = sum;
     va_end(coefs);
     double *pr = (double*)malloc((power)*sizeof(double));
+    if(pr == NULL){
+        print(memory_error);
+        return;
+    }
     int count = 0;
     while (count != power){
         double sum = 0.0;
@@ -60,6 +68,8 @@ void polynom(double eps, int a, double **result, int power, ...){
         }
         count++;
     }
+    free(coeffs);
+    free(pr);
 }
 int fact (int number){
     if(number == 0 || number == 1){
