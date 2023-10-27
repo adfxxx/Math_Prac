@@ -27,10 +27,10 @@ void print(int state);
 
 
 int main(){
-    overfprintf(stdout, "Roman: %Ro\nZeckendorf: %Zr\nTo base (low): %Cv\nTo base (high): %CV\nTo 10 base (low): %to\nTo 10 base (high): %TO\n", 865, 609, 123, 16, 123, 16, "7b", 16, "7B", 16);
+    overfprintf(stdout, "Roman: %Ro\nZeckendorf: %Zr\nTo base (low): %Cv\nTo base (high): %CV\nTo 10 base (low): %to\nTo 10 base (high): %TO\n", 865, 784, 123, 16, 123, 16, "7b", 16, "7B", 16);
     overfprintf(stdout, "Bytes (signed int): %mi\nBytes (unsigned int): %mu\nBytes (double): %md\nBytes (float): %mf\n", +123, 456, 7.89, 10.15);
     char buffer[256];
-    oversprintf(buffer, "BUFF\nRoman: %Ro\nZeckendorf: %Zr\nTo base (low): %Cv\nTo base (high): %CV\nTo 10 base (low): %to\nTo 10 base (high): %TO\n", 865, 609, 123, 16, 123, 16, "7b", 16, "7B", 16);
+    oversprintf(buffer, "BUFF\nRoman: %Ro\nZeckendorf: %Zr\nTo base (low): %Cv\nTo base (high): %CV\nTo 10 base (low): %to\nTo 10 base (high): %TO\n", 865, 784, 123, 16, 123, 16, "7b", 16, "7B", 16);
     buffer[255] = '\0';
     printf("\n%s", buffer);
     return success;
@@ -55,6 +55,7 @@ int oversprintf(char *buf, const char *format, ...){
     int count = 0;
     char *result = (char*)malloc((length+1)*sizeof(char));
     if(result == NULL){
+        va_end(args);
         print(memory_error);
         return fail;
     }
@@ -66,6 +67,7 @@ int oversprintf(char *buf, const char *format, ...){
                     check = vfprintf(stream, result, args);
                     if(check < 0){
                         free(result);
+                        va_end(args);
                         print(print_error);
                         return fail;
                     }
@@ -99,6 +101,7 @@ int oversprintf(char *buf, const char *format, ...){
         check = vfprintf(stream, result, args);
         if (check < 0) {
             free(result);
+            va_end(args);
             print(print_error);
             return fail;
         }
@@ -134,6 +137,7 @@ int overfprintf(FILE *stream, const char *format, ...){
     int count = 0;
     char *result = (char*)malloc((length+1)*sizeof(char));
     if(result == NULL){
+        va_end(args);
         print(memory_error);
         return fail;
     }
@@ -145,6 +149,7 @@ int overfprintf(FILE *stream, const char *format, ...){
                     check = vfprintf(stream, result, args);
                     if(check < 0){
                         free(result);
+                        va_end(args);
                         print(print_error);
                         return fail;
                     }
@@ -179,6 +184,7 @@ int overfprintf(FILE *stream, const char *format, ...){
         check = vfprintf(stream, result, args);
         if (check < 0) {
             free(result);
+            va_end(args);
             print(print_error);
             return fail;
         }
@@ -470,7 +476,7 @@ int flag_to(char *number, int base, int flag){
     if(base < 2 || base > 36){
         base = 10;
     }
-    if(number == 0){
+    if(number == "0"){
         return 0;
     }
     int length = strlen(number);
