@@ -8,33 +8,36 @@ enum errors{
     memory_error = -1
 };
 
-void polynom(double eps, int a, double **result, int power, ...);
+int polynom(double eps, int a, double **result, int power, ...);
 void print(int state);
 int fact (int number);
 
 int main(){
-    double epsilon = 0.00001;
+    double epsilon = 0.0001;
     double a = 3.0;
     double *result;
     int power = 4;
-    polynom(epsilon, a, &result, power, 1.0, 0.0, -3.0, 1.0, -2.0);
-    for(int i = 0; i <= power; i++){
-        printf("g%d = %lf\n", i, result[i]);
+    if(polynom(epsilon, a, &result, power, 1.0, 0.0, -3.0, 1.11, -2.0) == success){
+        for(int i = 0; i <= power; i++){
+            printf("g%d = %lf\n", i, result[i]);
+        }
+        free(result);
+        return success;
     }
-    free(result);
-    return success;
+    else{
+        print(memory_error);
+        return memory_error;
+    }
 }
 
-void polynom(double eps, int a, double **result, int power, ...){
+int polynom(double eps, int a, double **result, int power, ...){
     *result = (double*)malloc((power+1)*sizeof(double));
     if(*result == NULL){
-        print(memory_error);
-        return;
+        return memory_error;
     }
     double *coeffs = (double*)malloc((power)*sizeof(double));
     if(coeffs == NULL){
-        print(memory_error);
-        return;
+        return memory_error;
     }
     va_list coefs;
     va_start (coefs, power);
@@ -52,8 +55,8 @@ void polynom(double eps, int a, double **result, int power, ...){
     va_end(coefs);
     double *pr = (double*)malloc((power)*sizeof(double));
     if(pr == NULL){
-        print(memory_error);
-        return;
+        free(coeffs);
+        return memory_error;
     }
     int count = 0;
     while (count != power){

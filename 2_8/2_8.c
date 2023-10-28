@@ -18,8 +18,8 @@ int check_number(char *number, int base);
 void print(int state);
 
 int main(){
-    int base = 5;
-    char *result = total_sum(base, 3, "3", "2", "4");
+    int base = 10;
+    char *result = total_sum(base, 2, "003", "2");
     if (result != NULL){
         printf("Your sum is %s", result);
     }
@@ -49,6 +49,11 @@ char *total_sum(int base, int amount, ...){
 char *sum_in_st(char *num_1, char *num_2, int base){
     int length_1 = strlen(num_1);
     int length_2 = strlen(num_2);
+    if (remove_zeros(&num_1, length_1) == NULL || remove_zeros(&num_2, length_2) == NULL) {
+        return NULL;
+    }
+    length_1 = strlen(num_1);
+    length_2 = strlen(num_2);
     int max_length = (length_1 >= length_2) ? length_1 + 1 : length_2 + 1;
     char *result = (char*)calloc(max_length, sizeof(char));
     if(result == NULL){
@@ -93,19 +98,32 @@ char *remove_zeros(char **result, int length){
     while((*result)[count] == '0'){
         count++;
     }
-    if(count == 0){
+
+    if(count == length){ 
+        char *new_result = (char *)malloc(2 * sizeof(char));
+        if(new_result == NULL){
+            return NULL;
+        }
+        new_result[0] = '0';
+        new_result[1] = '\0';
+        free(*result);
+        *result = new_result;
         return *result;
     }
-    char *new_result = (char*)malloc((length - count + 1)*sizeof(char));
-    if(new_result == NULL){
-        return NULL;
+    else if(count > 0){
+        char *new_result = (char *)malloc((length - count + 1) * sizeof(char));
+        if(new_result == NULL){
+            return NULL;
+        }
+        strcpy(new_result, *result + count);
+        free(*result);
+        *result = new_result;
+        return *result;
     }
-    strcpy(new_result, *result+count);
-    free(*result);
-    *result = new_result;
-    free(new_result);
-} 
-
+    else {
+        return *result;
+    }
+}
 int transform(char *number){
     if(isdigit(*number)){
         return *number - '0';

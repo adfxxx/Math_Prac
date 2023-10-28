@@ -14,7 +14,7 @@ void find_sub(FILE *file, char *str, char *file_name);
 void print(char *file_name, int number, int position);
 
 int main(){
-    char *str = "7.9";
+    char *str = "a";
     char *file1 = "file1.txt";
     char *file2 = "file2.txt";
     char *file3 = "file3.txt";

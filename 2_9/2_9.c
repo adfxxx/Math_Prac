@@ -18,8 +18,8 @@ int is_period(double fraction, int system);
 int get_denumer(int numer);
 
 int main(){
-    int system = 4;
-    fraction(system, 0.5, 0.007, 0.6, 0.4353, -1.0);
+    int system = 10;
+    fraction(system, 0.5, 0.7, -1.0);
 }
 
 void fraction(int system, ...){
@@ -43,7 +43,6 @@ void fraction(int system, ...){
         else{
             print(fail, fraction);
         }
-        fraction = va_arg(fractions, double);
     }
     va_end(fractions);
 }

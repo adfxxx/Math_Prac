@@ -11,12 +11,17 @@ int check_convex(int sides, ...);
 double polynom(double point, int power, ...);
 
 int main(){
-    double A[] = {-4.34, 4.65};
-    double B[] = {-0.26, 4.57};
-    double C[] = {-0.44, -0.63};
-    double D[] = {4.16, -0.65};
-    double E[] = {-0.03, 5.3};
-    if(check_convex(5, A, B, C, D, E) == success){
+    double A[] = {1.0, 0.0};
+    double B[] = {2.0, 0.0};
+    double C[] = {1.0, 1.0};
+    double D[] = {2.0, 1.0};
+    double E[] = {1.33, 5.1};
+    // if(check_convex(5, A, B, C, D, E) == success){
+    //     printf("Is polygon convex: Yes\n");
+        
+    // }
+
+    if(check_convex(5, B, D, E, C, A) == success){
         printf("Is polygon convex: Yes\n");
         
     }

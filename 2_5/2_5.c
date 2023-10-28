@@ -13,8 +13,8 @@ enum errors{
     print_error = -5
 };
 
-int overfprintf(FILE *stream, const char *format, ...);
-int oversprintf(char *buf, const char *format, ...);
+void overfprintf(FILE *stream, const char *format, ...);
+void oversprintf(char *buf, const char *format, ...);
 int check_flag(char first, char second);
 void change_flags(FILE *stream, va_list *args, char first, char second);
 int flag_ro(int number, char **result);
@@ -27,7 +27,10 @@ void print(int state);
 
 
 int main(){
-    overfprintf(stdout, "Roman: %Ro\nZeckendorf: %Zr\nTo base (low): %Cv\nTo base (high): %CV\nTo 10 base (low): %to\nTo 10 base (high): %TO\n", 865, 784, 123, 16, 123, 16, "7b", 16, "7B", 16);
+    int a = -10;
+    FILE* fp = fopen("fperr.txt", "w");
+    overfprintf(fp, "\t a %mu %Ro\n", a, a);
+    overfprintf(stdout, "Roman: %Ro\nZeckendorf: %Zr\nTo base (low): %Cv\nTo base (high): %CV\nTo 10 base (low): %to\nTo 10 base (high): %TO\n", 0, 784, 123, 16, 123, 16, "7b", 16, "7B", 16);
     overfprintf(stdout, "Bytes (signed int): %mi\nBytes (unsigned int): %mu\nBytes (double): %md\nBytes (float): %mf\n", +123, 456, 7.89, 10.15);
     char buffer[256];
     oversprintf(buffer, "BUFF\nRoman: %Ro\nZeckendorf: %Zr\nTo base (low): %Cv\nTo base (high): %CV\nTo 10 base (low): %to\nTo 10 base (high): %TO\n", 865, 784, 123, 16, 123, 16, "7b", 16, "7B", 16);
@@ -36,28 +39,30 @@ int main(){
     return success;
 }
 
-int oversprintf(char *buf, const char *format, ...){
+void oversprintf(char *buf, const char *format, ...){
     FILE *stream = tmpfile();
     if(!stream){
         print(wrong_input);
-        return wrong_input;
+        return;
     }
     va_list args;
     va_start(args, format);
     int length = strlen(format);
     if(!length){
         print(wrong_input);
-        return fail;
+        return;
     }
     int i = 0;
     int j = 0;
     int check = 0;
     int count = 0;
+    int *flag;
+    int counter = 0;
     char *result = (char*)malloc((length+1)*sizeof(char));
     if(result == NULL){
         va_end(args);
         print(memory_error);
-        return fail;
+        return;
     }
     for(int i = 0; i < length; i++){
         if(format[i] == '%'){
@@ -69,13 +74,18 @@ int oversprintf(char *buf, const char *format, ...){
                         free(result);
                         va_end(args);
                         print(print_error);
-                        return fail;
+                        return;
                     }
                     j = 0;
                     for (int k = 0; k < count; ++k){
                         if (format[i + 2] == 'f') {
                             va_arg(args, double);
-                        } else {
+                        } 
+                        // else if (result[j - 1] == 'n') {
+                        //     flag = va_arg(args, int*);
+                        //     *flag = counter;
+                        // }
+                        else{
                             va_arg(args, void*);
                         }
                         i += 2;
@@ -95,6 +105,7 @@ int oversprintf(char *buf, const char *format, ...){
         }
         result[j] = format[i];
         j++;
+        counter++;
     }
     if (j != 0) {
         result[j] = '\0';
@@ -103,7 +114,7 @@ int oversprintf(char *buf, const char *format, ...){
             free(result);
             va_end(args);
             print(print_error);
-            return fail;
+            return;
         }
     }
     rewind(stream);
@@ -116,34 +127,36 @@ int oversprintf(char *buf, const char *format, ...){
     fclose(stream);
     free(result);
     va_end(args);
-    return success;
+    return;
 }
 
-int overfprintf(FILE *stream, const char *format, ...){
+void overfprintf(FILE *stream, const char *format, ...){
     if(!stream){
         print(wrong_input);
-        return (wrong_input);
+        return;
     }
     va_list args;
     va_start(args, format);
     int length = strlen(format);
     if(!length){
         print(wrong_input);
-        return fail;
+        return;
     }
     int i = 0;
     int j = 0;
     int check = 0;
     int count = 0;
+    int *flag;
+    int counter = 0;
     char *result = (char*)malloc((length+1)*sizeof(char));
     if(result == NULL){
         va_end(args);
         print(memory_error);
-        return fail;
+        return;
     }
     for(int i = 0; i < length; i++){
         if(format[i] == '%'){
-            if(check_flag(format[i+1], format[i+2]) == success){
+            if(check_flag(format[i+1], format[i+2]) == success || format[i+1] == 'n'){
                 if(i != 0){
                     result[j] = '\0';
                     check = vfprintf(stream, result, args);
@@ -151,17 +164,22 @@ int overfprintf(FILE *stream, const char *format, ...){
                         free(result);
                         va_end(args);
                         print(print_error);
-                        return fail;
+                        return;
                     }
                     j = 0;
                     for (int k = 0; k < count; ++k){
                         if (result[j - 1] == 'f'){
                             va_arg(args, double);
                         } 
+                        /* 
+                        else if (result[j - 1] == 'n') {
+                            flag = va_arg(args, int*);
+                            //*flag = counter;
+                        }
+                        */
                         else{
                             va_arg(args, void*);
                         } 
-                        j++;
                     }
                 }
                 count = 0;
@@ -178,6 +196,7 @@ int overfprintf(FILE *stream, const char *format, ...){
         }
         result[j] = format[i];
         j++;
+        counter++;
     }
     if (j != 0) {
         result[j] = '\0';
@@ -186,12 +205,12 @@ int overfprintf(FILE *stream, const char *format, ...){
             free(result);
             va_end(args);
             print(print_error);
-            return fail;
+            return;
         }
     }
     free(result);
     va_end(args);
-    return success;
+    return;
 }
 
 void change_flags(FILE *stream, va_list *args, char first, char second){

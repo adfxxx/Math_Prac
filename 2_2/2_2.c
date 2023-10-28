@@ -23,7 +23,7 @@ int main(){
         printf("Geometric mean: %lf\n", result);
     }
 
-    result = quick_pow(5.0, -2);
+    result = quick_pow(5.0, 4);
     printf("Number in power: %lf", result);
     return success;
 }
