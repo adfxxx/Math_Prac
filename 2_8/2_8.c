@@ -19,7 +19,7 @@ void print(int state);
 
 int main(){
     int base = 10;
-    char *result = total_sum(base, 2, "003", "2");
+    char *result = total_sum(base, 2, "000", "0");
     if (result != NULL){
         printf("Your sum is %s", result);
     }
@@ -85,6 +85,9 @@ char *sum_in_st(char *num_1, char *num_2, int base){
     }
     strcpy(real_result, result + index);
     free(result);
+    if(!strcmp(real_result, "0")){
+        return real_result;
+    }
     if(remove_zeros(&real_result, max_length - index + 1) == NULL){
         free(result);
         free(real_result);
@@ -98,7 +101,6 @@ char *remove_zeros(char **result, int length){
     while((*result)[count] == '0'){
         count++;
     }
-
     if(count == length){ 
         char *new_result = (char *)malloc(2 * sizeof(char));
         if(new_result == NULL){

@@ -14,10 +14,10 @@ int fact (int number);
 
 int main(){
     double epsilon = 0.0001;
-    double a = 3.0;
+    double a = 0.0;
     double *result;
-    int power = 4;
-    if(polynom(epsilon, a, &result, power, 1.0, 0.0, -3.0, 1.11, -2.0) == success){
+    int power = 1;
+    if(polynom(epsilon, a, &result, power, -13.0, 13.0) == success){
         for(int i = 0; i <= power; i++){
             printf("g%d = %lf\n", i, result[i]);
         }
@@ -25,6 +25,7 @@ int main(){
         return success;
     }
     else{
+        free(result);
         print(memory_error);
         return memory_error;
     }
@@ -48,7 +49,12 @@ int polynom(double eps, int a, double **result, int power, ...){
     }
     double sum = 0.0;
     for(int i = 0; i < power; i++){
-        sum += (coeffs[i]*pow(a, power - i));    
+        if(a == 0){
+            break;
+        }
+        else{
+            sum += (coeffs[i]*pow(a, power - i));  
+        }
     }
     sum += va_arg(coefs, double);
     (*result)[0] = sum;
