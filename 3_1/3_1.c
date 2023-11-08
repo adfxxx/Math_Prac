@@ -9,6 +9,8 @@ enum errors{
 
 void print(int state);
 int to_base(int number, int base, char **result, int power);
+int sum(int a, int b);
+int sub(int a, int b);
 
 int main(){
     int power = 0;
@@ -39,7 +41,7 @@ int main(){
 
 int to_base(int number, int base, char **result, int power){
     if(number < 0){
-        number = (-1)*number;
+        number = sum(~number, 1);
     }
     int length = 0;
     if(number == 0){
@@ -54,25 +56,48 @@ int to_base(int number, int base, char **result, int power){
     }
     int temp = number;
     while(temp > 0){
-        length++;
-        temp /= base;
+        length = sum(length, 1);
+        temp >>= power;
     }
-    *result = (char*)malloc((length+1)*sizeof(char));
+    *result = (char*)malloc((sum(length,1)*sizeof(char)));
     if (*result == NULL){
         return memory_error;
     }
+    (*result)[length] = '\0';
     int bit;
+    int index;
     for(int i = length - 1; i >= 0; i--){
-        bit = (number >> (i*power)) & (base - 1);
+        bit = number & sub(base, 1);
         if(bit >= 10){
-            (*result)[length - 1 - i] = bit + 'A' - 10;
+            temp = sum(bit, 'A');
+            (*result)[i] = sub(temp, 10);
         }
         else{
-            (*result)[length - 1 - i] = bit + '0';
+            (*result)[i] = sum(bit, '0');
         }
+        number >>= power;
     }
-    (*result)[length] = '\0';
     return success;
+}
+
+int sum(int a, int b){
+    int temp;
+    while(b != 0){
+        temp = a & b;
+        a ^= b;
+        b = temp << 1;
+    }
+    return a;
+}
+
+int sub(int a, int b){
+    int temp;
+    while(b != 0){
+        temp = (~a) & b;
+        a ^= b;
+        b = temp << 1;
+    }
+    return a;
 }
 
 void print(int state){

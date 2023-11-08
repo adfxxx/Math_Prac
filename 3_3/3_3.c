@@ -40,6 +40,7 @@ int main(int argc, char *argv[]){
 
     if(check_flag(argv[2]) == fail){
         print(wrong_input);
+        fclose(input);
         return wrong_input;
     }
     char flag = argv[2][1];
@@ -47,6 +48,7 @@ int main(int argc, char *argv[]){
     FILE *output = fopen(argv[3], "w");
     if(!output){
         print(is_not_open_output);
+        fclose(input);
         return is_not_open_output;
     }
 
@@ -55,6 +57,8 @@ int main(int argc, char *argv[]){
     int result = reading(input, &employees, &number_employ);
     if(result == memory_error){
         print(memory_error);
+        fclose(input);
+        fclose(output);
         return memory_error;
     }
 
@@ -93,7 +97,7 @@ int reading(FILE *input, Employee **employees, int *number_employ){
     while(getline(&line, &line_length, input) != -1){
         if(*number_employ == count){
             count *= 2;
-            Employee *temp = (Employee*)realloc(temp, count*sizeof(Employee));
+            Employee *temp = (Employee*)realloc(*employees, count*sizeof(Employee));
             if(temp == NULL){
                 free(line);
                 return (memory_error);

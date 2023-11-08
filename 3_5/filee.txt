@@ -1,0 +1,14 @@
+Student found by id:
+ 	Name: q, surname: w, group: 0, average grade: 2.200000
+Student found by id:
+ 	Name: vika, surname: doyanova, group: mai, average grade: 4.800000
+Student found by id:
+ 	Name: tanya, surname: lapidus, group: rgaumsha, average grade: 4.400000
+One of the best students:
+ 	Name: ldl, surname: rer
+One of the best students:
+ 	Name: vika, surname: doyanova
+One of the best students:
+ 	Name: tanya, surname: lapidus
+One of the best students:
+ 	Name: dr, surname: n
