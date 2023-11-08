@@ -32,6 +32,10 @@ int main(){
         print(memory_error);
         return memory_error;
     }
+    else if(total == memory_error){
+        print(wrong_input);
+        return wrong_input;
+    }
     else{
         printf("Result: %s", result);
         free(result);
@@ -40,6 +44,9 @@ int main(){
 }
 
 int to_base(int number, int base, char **result, int power){
+    if(power < 1 || power > 5){
+        return wrong_input;
+    }
     if(number < 0){
         number = sum(~number, 1);
     }

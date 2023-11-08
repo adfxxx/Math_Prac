@@ -29,7 +29,7 @@ int concate(String *first, const String *second);
 void print(int state);
 
 int main(){
-    char *str = "abc";
+    char *str = "";
     String example;
     int result = create(&example, str);
     if(result == memory_error){
@@ -75,11 +75,13 @@ int main(){
     else{
         printf("First string (%s) is not equal to second (%s)\n", string_1.string, string_2.string);
     }
+    char *rtr = "";
 
     copy_to_exist(&string_1, &string_2);
     printf("Copied string: %s\n", string_2.string);
 
     String new;
+
     copy_to_new(&string_1, &new);
     printf("Copied new string: %s\n", new.string);
 

@@ -1,0 +1,6 @@
+Student found by id:
+ 	Name: aba, surname: ababa, group: abab3, average grade: 3.400000
+Student found by id:
+ 	Name: a, surname: s, group: m, average grade: 3.800000
+Student found by id:
+ 	Name: q, surname: w, group: 0, average grade: 2.200000

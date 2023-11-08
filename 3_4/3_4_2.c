@@ -565,12 +565,6 @@ int add_package(Post *post, Address address_client, double weight, String id, St
             return id_error;
         }
     }
-    post->packages_number++;
-    Mail *temp_packages = (Mail*)realloc(post->packages, post->packages_number*sizeof(Mail));
-    if(temp_packages == NULL){
-        return memory_error;
-    }
-    post->packages = temp_packages;
 
     Mail new_mail;
     new_mail.address_client = address_client;
@@ -578,7 +572,34 @@ int add_package(Post *post, Address address_client, double weight, String id, St
     new_mail.id = id;
     new_mail.creation_time = creation_time;
     new_mail.delivery_time = delivery_time;
-    post->packages[post->packages_number-1] = new_mail;
+    
+    int index = 0;
+    int check_index = 0;
+    int check_id = 0;
+    while (index < post->packages_number){
+        Mail *cur_mail = &post->packages[index];
+        check_index = strcmp(new_mail.address_client.index.string, cur_mail->address_client.index.string);
+        if(check_index < 0){
+            break;
+        }
+        else if(check_index == 0){
+            check_id = strcmp(new_mail.id.string, cur_mail->id.string);
+            if(check_id < 0){
+                break;
+            }
+        }
+        index++;
+    }
+    post->packages_number++;
+    Mail *temp_packages = (Mail*)realloc(post->packages, post->packages_number*sizeof(Mail));
+    if(temp_packages == NULL){
+        return memory_error;
+    }
+    post->packages = temp_packages;
+    for(int i = post->packages_number-1; i > index; i--){
+        post->packages[i] = post->packages[i-1];
+    }
+    post->packages[index] = new_mail;
 
     delete(&id);
     delete(&creation_time);
