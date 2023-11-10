@@ -280,8 +280,8 @@ int main(){
                 else{
                     printf("Success.\n");
                 }
+                delete(&input_id);
             }
-            delete(&input_id);
             print(after_function);
             fflush(stdin);
             if(!scanf("%d", &option) || option < 1 || option > 2){
@@ -324,8 +324,8 @@ int main(){
                 else if (count == 0){
                     printf("There is not any package with this id.\n");
                 }
+                delete(&input_id);
             }
-            delete(&input_id);
             print(after_function);
             fflush(stdin);
             if(!scanf("%d", &option) || option < 1 || option > 2){
