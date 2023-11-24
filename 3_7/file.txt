@@ -1,0 +1,6 @@
+grigoriy leps vonyuchenskiy 31 2 1978 M 7.000000
+vika doyanova alekseevna 5 5 2003 W 100000.000000
+tanya lapkina konst 2 5 2004 W 1123141.000000
+qwe ewq qwe 6 6 2006 W 14.000000
+yana doyanova alekseevna 5 4 2008 W 1000011.000000
+popka zhopka - 24 12 2025 W 48948.000000

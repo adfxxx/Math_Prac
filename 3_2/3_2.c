@@ -48,8 +48,8 @@ int main(){
     v1.coords = (double[]){1.0, 2.0, 3.0}; //sqrt(14)
     v1.size = size;
     Vector v2;
-    //v2.coords = (double[]){-1.0, 2.0, -3.0};
-    v2.coords = (double[]){5.0, 7.0, -10.0}; //sqrt(174)
+    v2.coords = (double[]){-1.0, 2.0, -3.0};
+    //v2.coords = (double[]){5.0, 7.0, -10.0}; //sqrt(174)
     v2.size = size;
     Vector v3;
     v3.coords = (double[]){0.0, 0.0, 0.0};

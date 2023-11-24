@@ -1,0 +1,3 @@
+#define one two
+#define mall reall
+#define puk hoook

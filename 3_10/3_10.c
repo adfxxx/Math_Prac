@@ -17,6 +17,7 @@ typedef struct Node{
     struct Node** children;
 }Node;
 
+int check_name(char *name_1, char *name_2);
 Node* create_node(char data);
 int add_child(Node *parent, Node *child);
 Node* build_tree(const char *line);
@@ -29,6 +30,13 @@ int main(int argc, char *argv[]){
         print(wrong_input);
         return wrong_input;
     }
+
+    int result_check = check_name(argv[1], argv[2]);
+    if(result_check == wrong_input){
+        print(wrong_input);
+        return wrong_input;
+    }
+
     FILE *input = fopen(argv[1], "r");
     if(!input){
         print(is_not_open_input);
@@ -65,6 +73,61 @@ int main(int argc, char *argv[]){
     fclose(input);
     fclose(output);
     return success;
+}
+
+int check_name(char *name_1, char *name_2){
+    if(!strcmp(name_1, name_2)){
+        return wrong_input;
+    }
+    int length_1 = strlen(name_1);
+    int length_2 = strlen(name_2);
+    int position_1 = 0;
+    int position_2 = 0;
+    for (int i = length_1; i > 0 ; --i){
+        if (name_1[i] == '\\'){
+            position_1 = i + 1;
+            break;
+        }
+    }
+    for (int i = length_2; i > 0 ; --i){
+        if (name_2[i] == '\\'){
+            position_2 = i + 1;
+            break;
+        }
+    }
+    int flag = 0;
+    if(length_1 == length_2 - position_2 || length_2 == length_1 - position_1){
+        if(position_1 == 0){
+            int j = 0;
+            for(int i = position_2; i < length_2; i++){
+                if(name_1[j] == name_2[i]){
+                    flag = 1;
+                }
+                else{
+                    flag = 0;
+                }
+                j++;
+            }
+        }
+        if(position_2 == 0){
+            int k = 0;
+            for(int i = position_1; i < length_1; i++){
+                if(name_1[i] == name_2[k]){
+                    flag = 1;
+                }
+                else{
+                    flag = 0;
+                }
+                k++;
+            }
+        }
+    }
+    if(flag == 1){
+        return wrong_input;
+    }
+    else{
+        return success;
+    }
 }
 
 void print_tree(FILE *output, Node *node, int level){

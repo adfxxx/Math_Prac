@@ -1,0 +1,13 @@
+Load A, load.txt;
+Save A, load2.txt;
+Rand B, 10, 11, 100;
+Concat B, A;
+Free(B);
+Remove a, 2, 7;
+Copy A, 1, 3, b;
+Sort A-;
+Shuffle a;
+Stats b;
+Print a, 3;
+Print a, 1, 4;
+Print a, all;
