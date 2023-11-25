@@ -29,7 +29,7 @@ int count(char *line, int *result);
 int convert(char *line, char **result);
 int priority(char data);
 int check_brackets(char *line);
-int read_file(FILE *input, int number);
+int read_file(FILE *input, int number, char *input_name);
 void remove_n(char *line);
 int pop(Stack *stack, int *data, char *op);
 int push(Stack *stack, int data, char op);
@@ -47,12 +47,12 @@ int main(int argc, char *argv[]){
             print(is_not_open_input);
             continue;
         }
-        if(read_file(input, number) == is_not_open_input){
+        if(read_file(input, number, argv[i]) == is_not_open_input){
             printf("File with errors is not open, sorry.\n");
             fclose(input);
             return is_not_open_input;
         }
-        if(read_file(input, number) == memory_error){
+        if(read_file(input, number, argv[i]) == memory_error){
             print(memory_error);
             fclose(input);
             return memory_error;
@@ -268,7 +268,7 @@ int check_brackets(char *line){
     }
 }
 
-int read_file(FILE *input, int number){
+int read_file(FILE *input, int number, char *input_name){
     if(number > 999){
         return memory_error;
     }
@@ -345,7 +345,7 @@ int read_file(FILE *input, int number){
             continue;
         }
         else{
-            printf("Expression: %s, RPN: %s, calculated result: %d\n", line, result, res);  
+            printf("FILE: %s, expression: %s, RPN: %s, calculated result: %d\n", input_name, line, result, res);  
         }
         free(result);
     }

@@ -8,3 +8,30 @@ Line: *, number: 17, reason: not enough ops to finish calculating.
 Line: +, number: 19, reason: not enough ops to finish calculating.
 Line: -, number: 21, reason: not enough ops to finish calculating.
 Line: /, number: 23, reason: not enough ops to finish calculating.
+Line: 15*, number: 3, reason: not enough ops to finish calculating.
+Line: (((31-10)))), number: 5, reason: error in brackets.
+Line: 10/0, number: 7, reason: division by zero.
+Line: a+b, number: 12, reason: wrong symbols in the line.
+Line: a+b=c, number: 14, reason: wrong symbols in the line.
+Line:  , number: 16, reason: wrong expression.
+Line: 3++4, number: 2, reason: not enough ops to finish calculating.
+Line: 15*, number: 5, reason: not enough ops to finish calculating.
+Line: (((31-10)))), number: 7, reason: error in brackets.
+Line: 10/0, number: 9, reason: division by zero.
+Line: a+b, number: 14, reason: wrong symbols in the line.
+Line: a+b=c, number: 16, reason: wrong symbols in the line.
+Line:  , number: 18, reason: wrong expression.
+Line: 3++4, number: 2, reason: not enough ops to finish calculating.
+Line: 15*, number: 5, reason: not enough ops to finish calculating.
+Line: (((31-10)))), number: 7, reason: error in brackets.
+Line: 10/0, number: 9, reason: division by zero.
+Line: a+b, number: 14, reason: wrong symbols in the line.
+Line: a+b=c, number: 16, reason: wrong symbols in the line.
+Line: , number: 18, reason: wrong expression.
+Line: 3++4, number: 2, reason: not enough ops to finish calculating.
+Line: 15*, number: 5, reason: not enough ops to finish calculating.
+Line: (((31-10)))), number: 7, reason: error in brackets.
+Line: 10/0, number: 9, reason: division by zero.
+Line: a+b, number: 14, reason: wrong symbols in the line.
+Line: a+b=c, number: 16, reason: wrong symbols in the line.
+Line: , number: 18, reason: wrong expression.

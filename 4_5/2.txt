@@ -1,0 +1,10 @@
+Line: 76(4566+8), number: 4, reason: wrong expression.
+Line: 9/0, number: 7, reason: division by zero.
+Line: 7.95=14x, number: 9, reason: wrong symbols in the line.
+Line: 56+2*[4-14], number: 11, reason: wrong symbols in the line.
+Line: {5+5}/2, number: 13, reason: wrong symbols in the line.
+Line: ), number: 15, reason: error in brackets.
+Line: *, number: 17, reason: not enough ops to finish calculating.
+Line: +, number: 19, reason: not enough ops to finish calculating.
+Line: -, number: 21, reason: not enough ops to finish calculating.
+Line: /, number: 23, reason: not enough ops to finish calculating.

@@ -1,4 +1,6 @@
 Load A, load.txt;
+
+
 Save A, load2.txt;
 Rand B, 10, 11, 100;
 Concat B, A;
