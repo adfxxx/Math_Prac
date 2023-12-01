@@ -59,6 +59,11 @@
   "files.associations": {
     "type_traits": "c",
     "typeinfo": "c",
-    "functional": "c"
+    "functional": "c",
+    "*.tcc": "c",
+    "string": "c",
+    "istream": "c",
+    "time.h": "c",
+    "algorithm": "c"
   }
 }

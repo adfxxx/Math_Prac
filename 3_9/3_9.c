@@ -24,6 +24,7 @@ typedef struct Node{
     struct Node *right;
 }Node;
 
+void free_node(Node *node);
 int write_to_file(FILE *output, Node *root, char *separator, int flag);
 int get_tree_depth(Node *root);
 int get_long_short_word(Node *root, char **long_word, char **short_word);
@@ -38,7 +39,6 @@ Node *insert(Node *root, char *word);
 int read_file(FILE *input, char *separator, Node **root);
 int get_sep(char **separator, int count, char *args[]);
 int is_sep(const char symbol, char *separator);
-void free_words(Node **words, int number);
 void print(int state);
 
 int main(int argc, char *argv[]){
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]){
         fclose(input);
         return memory_error;
     }
-
+    free_node(root);
     printf("\nGoodbye!");
     free(separator);
     fclose(input);
@@ -99,7 +99,7 @@ int change_command(Node *root, char *separator){
             print(wrong_input);
             print(menu);
             fflush(stdin);
-            while(!scanf("%d", &option) || option < 1 || option > 6){
+            while(!scanf("%d", &option) || option < 1 || option > 7){
                 fflush(stdin);
                 print(wrong_input);
                 print(menu);
@@ -158,7 +158,6 @@ int change_command(Node *root, char *separator){
             for(int i = 0; i < number; i++){
                 printf("%d. %s\n", i+1, words[i]->word);
             }
-            //free_words(words, number);
 
             print(after_function);
             fflush(stdin);
@@ -351,7 +350,7 @@ Node **get_n_words(Node *root, int number){
 }
 
 void get_words(Node *root, Node **words, int *count, int number){
-    if(root != NULL){
+    if(root != NULL && *count < number){
         get_words(root->right, words, count, number);
 
         if(*count < number || root->count > words[number - 1]->count){
@@ -504,21 +503,13 @@ int get_sep(char **separator, int count, char *args[]){
     return success;
 }
 
-// void free_node(Node *node){
-//     if(node != NULL){
-//         free_node(node->left);
-//         free_node(node->right);
-//         free(node->word);
-//         free(node);
-//     }
-// }
-
-void free_words(Node **words, int number){
-    for(int i = 0; i < number; i++){
-        free(words[i]->word);
-        free(words[i]);
+void free_node(Node *node){
+    if(node != NULL){
+        free_node(node->left);
+        free_node(node->right);
+        free(node->word);
+        free(node);
     }
-    free(words);
 }
 
 void print(int state){
