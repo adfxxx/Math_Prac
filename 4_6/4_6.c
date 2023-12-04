@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <string.h>
+#include <stdbool.h>
 
 enum errors{
     success = 1,
@@ -13,40 +14,54 @@ enum errors{
     is_not_open_output = -5
 };
 
-enum ops{
-    Variable,
-    Constant,
-    And,
-    Or,
-    Not,
-    Impl,
-    Coimpl,
-    Xor,
-    Equiv,
-    Sheff,
-    Webb
-};
+typedef struct Stack_node{
+    char data;
+    int op;
+    struct Stack_node *next;
+}Stack_node;
+
+typedef struct{
+    struct Stack_node *top;
+}Stack;
 
 typedef struct Node{
-    enum ops op;
-    char name;
-    int constant;
+    char data;
     struct Node *left;
     struct Node *right;
 }Node;
 
-int calculate(Node *root, int *values);
+typedef struct Node_stack_n{
+    Node *tree_node;
+    struct Node_stack_n *next;
+}Node_stack_n;
+
+typedef struct Node_stack{
+    Node_stack_n *top;
+}Node_stack;
+
+void free_tree(Node *root);
+int calculate(Node *root, int *values, int number, char *names);
 int print_table(Node *root, int number, char *names);
 char *get_file_name();
-void free_tree(Node *root);
-Node *create_node(enum ops op, char name, int constant);
-Node *get_var(char *line, int *index);
-Node *get_expr(char *line, int *index);
+Node *build_tree(char *line);
+Node *create_node(char data);
+Node *pop_node(Node_stack *stack);
+int push_node(Node_stack *stack, Node *node);
+Node_stack *create_node_stack();
+void free_node_stack(Node_stack *stack);
+int convert(char *line, char **result);
+int priority(char data);
 int read_file(FILE *input);
+Stack *create_stack();
+int push(Stack *stack, int data, char op);
+void pop(Stack *stack, int *data, char *op);
+void free_stack(Stack *stack);
+int get_vars(char *line, char **names);
 int check_brackets(char *line);
-int count_vars(char *line, char **names);
-int is_op(char *line, int index);
+void remove_n(char *line);
 void print(int state);
+void print_spaces(int count);
+void print_tree(Node *root, int depth);
 
 int main(int argc, char *argv[]){
     if(argc != 2){
@@ -60,102 +75,84 @@ int main(int argc, char *argv[]){
         return is_not_open_input;
     }
     int result = read_file(input);
-    if(result == wrong_input || result == fail){
-        fclose(input);
+    fclose(input);
+    if(result == wrong_input){
         print(wrong_input);
         return wrong_input;
     }
     else if(result == is_not_open_output){
-        fclose(input);
         print(is_not_open_output);
         return is_not_open_output;
     }
     else if(result == memory_error){
-        fclose(input);
         print(memory_error);
         return memory_error;
     }
+    else if(result == fail){
+        print(fail);
+        return fail;
+    }
 
+    printf("Success.\n");
     return success;
 }
 
-void print_tree(Node *root, int level){
+void free_tree(Node *root){
     if(root == NULL){
         return;
     }
-    print_tree(root->right, level+1);
-    for(int i = 0; i < level; i++){
-        printf("  ");
-    }
-    switch (root->op) {
-        case Variable:
-            printf("Variable: %c\n", root->name);
-            break;
-        case Constant:
-            printf("Constant: %d\n", root->constant);
-            break;
-        case And:
-            printf("AND\n");
-            break;
-        case Or:
-            printf("OR\n");
-            break;
-        case Not:
-            printf("NOT\n");
-            break;
-        case Impl:
-            printf("IMPLICATION\n");
-            break;
-        case Coimpl:
-            printf("COIMPLICATION\n");
-            break;
-        case Xor:
-            printf("XOR\n");
-            break;
-        case Equiv:
-            printf("EQUIVALENCE\n");
-            break;
-        case Sheff:
-            printf("SHEFFER\n");
-            break;
-        case Webb:
-            printf("WEBB\n");
-            break;
-    }
-    print_tree(root->left, level+1);
+    free_tree(root->left);
+    free_tree(root->right);
+    free(root);
 }
 
-int calculate(Node *root, int *values){
+int calculate(Node *root, int *values, int number, char *names){
     if(root == NULL){
-        return 0;
+        return fail;
     }
-    int left_result = calculate(root->left, values);
-    int right_result = calculate(root->right, values);
-    switch(root->op){
-        case Variable:
-        return values[root->name - 'A'];
-        case Constant:
-        return root->constant;
-        case Not:
-        return !left_result;
-        case And:
-        return left_result && right_result;
-        case Or:
-        return left_result || right_result;
-        case Impl:
-        return !left_result || right_result;
-        case Coimpl:
-        return left_result || !right_result;
-        case Equiv:
-        return left_result == right_result; 
-        case Sheff:
-        return !left_result && right_result; 
-        case Webb:
-        return left_result && right_result;
+    int left = calculate(root->left, values, number, names);
+    int right = calculate(root->right, values, number, names);
+    if(root->data == '1'){
+        return root->data - '0';
+    }
+    else if(root->data == '0'){
+        return root->data  - '0';
+    }
+    else if(isalpha(root->data)){
+        for(int i = 0; i < number; i++){
+            if(root->data == names[i]){
+                return values[i];
+            }
+        }
+    }
+    else{
+        switch(root->data){
+            case '~':
+            return !left;
+            case '&':
+            return left && right;
+            case '|':
+            return left || right;
+            case '-':
+            return !left || right;
+            case '+':
+            return left || !right;
+            case '<':
+            return (left || right) && !(left && right);
+            case '=':
+            return left == right; 
+            case '!':
+            return !(left && right); 
+            case '?':
+            return !(left || right);
+        }
     }
 }
 
 int print_table(Node *root, int number, char *names){
+    if(root == NULL){
+        return fail;
+    }
     char *file_name = get_file_name();
     if(file_name == NULL){
         return memory_error;
@@ -164,7 +161,7 @@ int print_table(Node *root, int number, char *names){
     if(!output){
         return is_not_open_output;
     }
-    int num_row = 1 << number;
+    int num_row = 1 << number; //2^number
     for(int i = 0; i < number; i++){
         fprintf(output, "%c ", names[i]);
     }
@@ -180,13 +177,11 @@ int print_table(Node *root, int number, char *names){
     }
     int result;
     for (int row = 0; row < num_row; row++) {
-        int temp_row = row;
         for (int i = 0; i < number; i++) {
-            values[i] = temp_row % 2;
-            temp_row /= 2;
-            fprintf(output, "%d ", values[i]);
+            values[i] = (row>>i) & 1; //row/2^i
+            fprintf(output, "%d ", (row>>i) & 1);
         }
-        result = calculate(root, values);
+        int result = calculate(root, values, number, names);
         fprintf(output, "| %d\n", result);
     }
     free(values);
@@ -216,126 +211,216 @@ char *get_file_name(){
     file_name[9] = 't';
     file_name[10] = '\0';
     return file_name;
-}
+ }
 
-void free_tree(Node *root){
-    if(root == NULL){
-        return;
+ Node *build_tree(char *line){
+    Node_stack *stack = create_node_stack();
+    if(stack == NULL){
+        return NULL;
     }
-    free_tree(root->left);
-    free_tree(root->right);
-    free(root);
+    int length = strlen(line);
+    char cur;
+    for (int i = 0; i < length; i++){
+        cur = line[i];
+        if(isalpha(cur) || cur == '1' || cur == '0'){
+            Node *new_node = create_node(cur);
+            if(new_node == NULL){
+                free_node_stack(stack);
+                return NULL;
+            }
+            if(push_node(stack, new_node) == memory_error){
+                free_node_stack(stack);
+                return NULL;
+            }
+        }
+        else if(cur == ' '){
+            continue;
+        }
+        else if(cur == '~'){
+            Node *var = pop_node(stack);
+            Node *op_node = create_node(cur);
+            if(op_node == NULL){
+                free_node_stack(stack);
+                return NULL;
+            }
+            op_node->left = var;
+            op_node->right = NULL;
+            if(push_node(stack, op_node) == memory_error){
+                free_node_stack(stack);
+                return NULL;
+            }
+        }
+        else{
+            Node *right = pop_node(stack);
+            Node *left = pop_node(stack);
+            Node *op_node = create_node(cur);
+            if(op_node == NULL){
+                free_node_stack(stack);
+                return NULL;
+            }
+            op_node->left = left;
+            op_node->right = right;
+            if(push_node(stack, op_node) == memory_error){
+                free_node_stack(stack);
+                return NULL;
+            }
+        }
+    }
+    Node *root = pop_node(stack);
+    free_node_stack(stack);
+    return root;
 }
 
-Node *create_node(enum ops op, char name, int constant){
+Node *create_node(char data){
     Node *new_node = (Node*)malloc(sizeof(Node));
     if(new_node == NULL){
         return NULL;
     }
-    new_node->op = op;
-    new_node->constant = constant;
-    new_node->name = name;
+    new_node->data = data;
     new_node->left = NULL;
     new_node->right = NULL;
-
     return new_node;
 }
 
-Node *get_var(char *line, int *index){
-    Node *node = NULL;
-    if(line[*index] == ' '){
-        (*index)++;
-    }
-    if(line[*index] == '('){
-        (*index)++;
-        node = get_expr(line, index);
-        if(node == NULL){
-            return NULL;
-        }
-        if(line[*index] == ')'){
-            (*index)++;
-        }
-        else{
-            return NULL;
-        }
-    }
-    else if(isalpha(line[*index]) || line[*index] == '~'){
-        if(line[*index] == '~'){
-            (*index)++;
-            node = create_node(Not, '\0', 0);
-            if(node == NULL){
-                return NULL;
-            }
-            node->left = get_var(line, index);
-        }
-        else{   
-            node = create_node(Variable, line[*index], 0);
-            if(node == NULL){
-                return NULL;
-            }
-            (*index)++;
-        }
-    }
-    else if(line[*index] == '0' || line[*index] == '1'){
-        node = create_node(Constant, '\0', line[*index] - '0');
-        if(node == NULL){
-            return NULL;
-        }
-    }
-    else if(is_op(line, *index) == fail){
+Node *pop_node(Node_stack *stack){
+    if(stack->top == NULL){
         return NULL;
     }
+    Node_stack_n *temp = stack->top;
+    Node *node = temp->tree_node;
+    stack->top = temp->next;
+    free(temp);
     return node;
 }
 
-Node *get_expr(char *line, int *index){
-    Node *node = get_var(line, index);
-    if(node == NULL){
+int push_node(Node_stack *stack, Node *node){
+    Node_stack_n *new_node = (Node_stack_n*)malloc(sizeof(Node_stack_n));
+    if(new_node == NULL){
+        return memory_error;
+    }
+    new_node->tree_node = node;
+    new_node->next = stack->top;
+    stack->top = new_node;
+    return success;
+}
+
+Node_stack *create_node_stack(){
+    Node_stack *new_node = (Node_stack*)malloc(sizeof(Node_stack));
+    if(new_node == NULL){
         return NULL;
     }
-    if(line[*index] == ' '){
-        (*index)++;
+    new_node->top = NULL;
+    return new_node;
+}
+
+void free_node_stack(Node_stack *stack){
+    while(stack->top != NULL){
+        Node_stack_n *temp = stack->top;
+        stack->top = temp->next;
+        free(temp);
     }
-    int op = is_op(line, *index);
-    if(op != fail){
-        Node *temp = NULL;
-        switch(op){
-            case And:
-                temp = create_node(And, '\0', 0);
-                break;
-            case Or:
-                temp = create_node(Or, '\0', 0);
-                break;
-            case Impl:
-                temp = create_node(Impl, '\0', 0);
-                (*index)++;
-                break;
-            case Coimpl:
-                temp = create_node(Coimpl, '\0', 0);
-                (*index)++;
-                break;
-            case Equiv:
-                temp = create_node(Equiv, '\0', 0);
-                break;
-            case Sheff:
-                temp = create_node(Sheff, '\0', 0);
-                break;
-            case Webb:
-                temp = create_node(Webb, '\0', 0);
-                break;
+    free(stack);
+}
+
+int convert(char *line, char **result){
+    Stack *stack = create_stack();
+    if(stack == NULL){
+        return memory_error;
+    }
+    int length = strlen(line);
+    char cur;
+    int j = 0;
+    char name;
+    int data;
+    char op;
+    for(int i = 0; i < length; i++){
+        cur = line[i];
+        if(cur == '>'){
+            continue;
         }
-        if(temp == NULL){
-            return NULL;
+        if(isalpha(cur)){
+            name = toupper(line[i]);
+            (*result)[j] = name;
+            j++;
+            (*result)[j] = ' ';
+            j++;
         }
-        (*index)++;
-        temp->left = node;
-        temp->right = get_expr(line, index);
-        node = temp;
+        else if(isdigit(cur) && cur != '1' && cur != '0'){
+            free_stack(stack);
+            return wrong_input;
+        }
+        else if(cur == '1' || cur == '0'){
+            (*result)[j] = cur;
+            j++;
+            (*result)[j] = ' ';
+            j++;
+        }
+        else if(cur == ' '){
+            continue;
+        }
+        else if(cur == '('){
+            if(push(stack, 0, cur) == memory_error){
+                free_stack(stack);
+                return memory_error;
+            }
+        }
+        else if(cur == ')'){
+            while(stack->top != NULL && stack->top->op != '('){
+                pop(stack, &data, &op);
+                (*result)[j] = op;
+                j++;
+                (*result)[j] = ' ';
+                j++;
+            }
+            pop(stack, &data, &op);
+        }
+        else if(cur == '&' || cur == '|' || cur == '~' || cur == '-' || cur == '+' || cur == '<' || cur == '=' || cur == '!' || cur == '?'){
+            if((cur == '-' || cur == '+' || cur == '<') && line[i+1] != '>'){
+                free_stack(stack);
+                return wrong_input;
+            }
+            while(stack->top != NULL && priority(stack->top->op) >= priority(cur)){
+                pop(stack, &data, &op);
+                (*result)[j] = op;
+                j++;
+                (*result)[j] = ' ';
+                j++;
+            }
+            if(push(stack, 0, cur) == memory_error){
+                free_stack(stack);
+                return memory_error;
+            }
+        }
+        else{
+            free_stack(stack);
+            return wrong_input;
+        }
+    }
+    while(stack->top != NULL){
+        pop(stack, &data, &op);
+        (*result)[j] = op;
+        j++;
+        (*result)[j] = ' ';
+        j++;
+    }
+    (*result)[j] = '\0';
+    free_stack(stack);
+    return success;
+}
+
+int priority(char data){
+    if(data == '~'){
+        return 3;
+    }
+    else if(data == '?' || data == '!' || data == '+' || data == '&'){
+        return 2;
+    }
+    else if(data == '|' || data == '-' || data == '<' || data == '='){
+        return 1;
     }
     else{
-        return NULL;
+        return 0;
     }
-    return node;
 }
 
 int read_file(FILE *input){
@@ -344,46 +429,125 @@ int read_file(FILE *input){
     if(getline(&line, &len, input) == -1){
         return wrong_input;
     }
+    remove_n(line);
     if(check_brackets(line) == fail){
         free(line);
-        return fail;
+        return wrong_input;
     }
     int index = 0;
-    Node *node = get_expr(line, &index);
-    if(node == NULL){
+    int length = strlen(line);
+    char *result = (char*)malloc(length*2*sizeof(char));
+    if(result == NULL){
         free(line);
-        return fail;
+        return memory_error;
     }
     char *names = (char*)malloc(100*sizeof(char));
     if(names == NULL){
+        free(result);
         free(line);
-        free_tree(node);
         return memory_error;
     }
-    int number = count_vars(line, &names);
+    int number = get_vars(line, &names);
     if(number == wrong_input){
-        free(names);
+        free(result);
         free(line);
-        free_tree(node);
+        free(names);
         return wrong_input;
     }
-    print_tree(node, 0);
-    if(print_table(node, number, names) == is_not_open_output){
-        free(names);
+    int res = convert(line, &result);
+    if(res == memory_error){
+        free(result);
         free(line);
-        free_tree(node);
-        return is_not_open_output;
-    }
-    else if(print_table(node, number, names) == memory_error){
-        free_tree(node);
         free(names);
-        free(line);
         return memory_error;
     }
-    free_tree(node);
-    free(names);
+    else if(res == wrong_input){
+        free(result);
+        free(line);
+        free(names);
+        return wrong_input;
+    }
     free(line);
+    Node *root = build_tree(result);
+    if(root == NULL){
+        free(result);
+        free(names);
+        return memory_error;
+    }
+    free(result);
+    res = print_table(root, number, names);
+    free_tree(root);
+    free(names);
+    if(res == fail){
+        return fail;
+    }
+    else if(res == memory_error){
+        return memory_error;
+    }
+    else if(res == is_not_open_output){
+        return is_not_open_output;
+    }
     return success;
+}
+
+void free_stack(Stack *stack){
+    while(stack->top != NULL){
+        Stack_node *temp = stack->top;
+        stack->top = temp->next;
+        free(temp);
+    }
+    free(stack);
+}
+
+void pop(Stack *stack, int *data, char *op){
+    if(stack->top == NULL){
+        return;
+    }
+    Stack_node *temp = stack->top;
+    *data = temp->data;
+    *op = temp->op;
+    stack->top = temp->next;
+    free(temp);
+    return;
+}
+
+int push(Stack *stack, int data, char op){
+    Stack_node *new_node = (Stack_node*)malloc(sizeof(Stack_node));
+    if(new_node == NULL){
+        return memory_error;
+    }
+    new_node->data = data;
+    new_node->op = op;
+    new_node->next = stack->top;
+    stack->top = new_node;
+    return success;
+}
+
+Stack *create_stack(){
+    Stack *stack = (Stack*)malloc(sizeof(Stack));
+    if(stack == NULL){
+        return NULL;
+    }
+    stack->top = NULL;
+    return stack;
+}
+
+int get_vars(char *line, char **names){
+    int number = 0;
+    int vars[26] = {0};
+    while(*line){
+        if(isalpha(*line) && !vars[toupper(*line) - 'A']){
+            if(number == 100){
+                return wrong_input;
+            }
+            vars[toupper(*line) - 'A'] = 1;
+            (*names)[number] = (char)toupper(*line);
+            number++; 
+        }
+        line++;
+    }
+    (*names)[number] = '\0';
+    return number;
 }
 
 int check_brackets(char *line){
@@ -405,52 +569,12 @@ int check_brackets(char *line){
     }
 }
 
-int count_vars(char *line, char **names){
-    int number = 0;
-    int vars[26] = {0};
-    while(*line){
-        if(isalpha(*line) && !vars[toupper(*line) - 'A']){
-            if(number == 100){
-                return wrong_input;
-            }
-            vars[toupper(*line) - 'A'] = 1;
-            (*names)[number] = (char)toupper(*line);
-            number++; 
+void remove_n(char *line){
+    int length = strlen(line);
+    for(int i = 0; i < length; i++){
+        if(line[i] == '\n'){
+            line[i] = '\0';
         }
-        line++;
-    }
-    (*names)[number] = '\0';
-    return number;
-}
-
-int is_op(char *line, int index){
-    switch(line[index]){
-        case '&':
-        return And;
-        case '|':
-        return Or;
-        case '-':
-        if(line[index+1] == '>'){
-            return Impl;
-        }
-        else{
-            return fail;
-        }
-        case '+':
-        if(line[index+1] == '>'){
-            return Coimpl;
-        }
-        else{
-            return fail;
-        }
-        case '=':
-        return Equiv;
-        case '!':
-        return Sheff;
-        case '?':
-        return Webb;
-        default:
-        return fail;
     }
 }
 
@@ -467,4 +591,27 @@ void print(int state){
     else if(state == is_not_open_output){
         printf("Output file is not open\n");
     }
+    else if(state == fail){
+        printf("Error with tree, it might be empty.\n");
+    }
 }
+
+// void print_spaces(int count) {
+//     for (int i = 0; i < count; i++) {
+//         printf(" ");
+//     }
+// }
+
+// void print_tree(Node *root, int depth) {
+//     if (root == NULL) {
+//         return;
+//     }
+//     print_tree(root->right, depth + 1);
+//     print_spaces(depth * 4);
+//     if (isalpha(root->data)) {
+//         printf("%c\n", root->data);
+//     } else {
+//         printf("%c\n", root->data);
+//     }
+//     print_tree(root->left, depth + 1);
+// }

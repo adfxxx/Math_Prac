@@ -746,7 +746,10 @@ Polynom cmps_poly(Polynom *poly_1, Polynom *poly_2){
 Polynom diff_poly(Polynom *poly){
     Polynom result;
     create_polynom(&result);
-
+    if(poly->head->coef == 0 && poly->head->power == 0){
+        add_monom(0, 0, &result);
+        return result;
+    }
     Monom *cur = poly->head;
     int new_coef = 0;
     int new_power = 0; 
@@ -1011,6 +1014,9 @@ Polynom add_poly(Polynom *poly_1, Polynom *poly_2){
 void print_poly(Polynom *poly){
     Monom *cur = poly->head;
     while(cur != NULL){
+        if(cur->coef == 0 && cur->power == 0){
+            printf("0 ");
+        }
         if(cur->coef == 1){
             if(cur->power == 0){
                 printf("%d ", cur->coef);

@@ -37,11 +37,26 @@ void print_tree(Node *root, int level);
 Node *create_node(char *word);
 Node *insert(Node *root, char *word);
 int read_file(FILE *input, char *separator, Node **root);
-int get_sep(char **separator, int count, char *args[]);
 int is_sep(const char symbol, char *separator);
 void print(int state);
 
 int main(int argc, char *argv[]){
+    if(argc < 3){
+        print(wrong_input);
+        return wrong_input;
+    }
+    int size = argc-1;
+    char *separator = (char*)malloc(size*sizeof(char));
+    if(separator == NULL){
+        print(memory_error);
+        return memory_error;
+    }
+    int j = 0;
+    for(int i = 2; i < argc; i++){
+        separator[j] = argv[i][0];
+        j++;
+    }
+    separator[j] = '\0';
     FILE *input = fopen(argv[1], "r");
     if(!input){
         print(is_not_open_input);
@@ -49,22 +64,6 @@ int main(int argc, char *argv[]){
     }
 
     int result;
-    int size = argc-2;
-    char *separator = (char*)malloc(size*sizeof(char));
-    if(separator == NULL){
-        fclose(input);
-        print(memory_error);
-        return memory_error;
-    }
-    separator[size] = '\0';
-    result = get_sep(&separator, argc-2, argv+2);
-    if(result == memory_error){
-        fclose(input);
-        free(separator);
-        print(memory_error);
-        return memory_error;
-    }
-    
     Node *root = NULL;
     result = read_file(input, separator, &root);
     if(result == memory_error){
@@ -402,10 +401,20 @@ int read_file(FILE *input, char *separator, Node **root){
         if(is_sep(symbol, separator) == fail){
             word[index] = symbol;
             index++;
+            if(index == size-1){
+                char *temp = (char*)realloc(word, (size*2)*sizeof(char));
+                if(temp == NULL){
+                    free(word);
+                    return memory_error;
+                }
+                word = temp;
+                size *= 2;
+            }
         }
         else{
             if(index > 0){
                 word[index] = '\0';
+                printf("%s\n", word);
                 *root = insert(*root, word);
                 if(*root == NULL){
                     free(word);
@@ -468,6 +477,7 @@ int total_words(Node *root){
 Node *create_node(char *word){
     Node *new_node = (Node*)malloc(sizeof(Node));
     if(new_node == NULL){
+        printf("!");
         return NULL;
     }
     new_node->word = strdup(word);
@@ -494,13 +504,6 @@ Node *insert(Node *root, char *word){
         }
     }
     return root;
-}
-
-int get_sep(char **separator, int count, char *args[]){
-    for(int i = 0; i < count; i++){
-        (*separator)[i] = *args[i];
-    }
-    return success;
 }
 
 void free_node(Node *node){

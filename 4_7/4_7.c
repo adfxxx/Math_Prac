@@ -290,6 +290,7 @@ int save(char *name, char *value, int *memory_size, MemoryCell **memory, int *co
             (*memory_size) *= 2;
             MemoryCell *temp = (MemoryCell*)realloc(*memory, (*memory_size)*sizeof(MemoryCell));
             if(temp == NULL){
+                (*memory_size) /=2;
                 return memory_error;
             }
             *memory = temp;
@@ -304,8 +305,8 @@ int save(char *name, char *value, int *memory_size, MemoryCell **memory, int *co
     return success;
 }
 
-int compare_names(const void *a, const void *b){
-    return strcmp(((MemoryCell*)a)->name, ((MemoryCell*)b)->name);
+int compare_names(void const *a, const void *b){
+    return strcmp(((MemoryCell const*)a)->name, ((MemoryCell const*)b)->name);
 }
 
 int read_file(FILE *input, MemoryCell **memory, int *memory_size, int *count){
