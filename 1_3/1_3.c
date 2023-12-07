@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <locale.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -101,12 +100,12 @@ double flag_q (double eps, double a, double b, double c){
     if (discr > eps){
         double x_1 = (-b + discr)/(2*a);
         double x_2 = (-b - discr)/(2*a);
-        printf("Для набора %.3f %.3f %.3f x1 = %f, x2 = %f\n", a, b, c, x_1, x_2);
+        printf("For coefs %.3f %.3f %.3f x1 = %f, x2 = %f\n", a, b, c, x_1, x_2);
     }
     else if (discr == 0){
-        printf("Для набора %.3f %.3f %.3f x = \n", a, b, c, ((-b)/(2*a)));
+        printf("For coefs %.3f %.3f %.3f x = \n", a, b, c, ((-b)/(2*a)));
     }
-    else { printf ("Для набора %.3f %.3f %.3f корней нет\n", a, b, c);}
+    else { printf ("For coefs %.3f %.3f %.3f are no x.\n", a, b, c);}
 }
 
 void sort_numbers(double *numbers)
@@ -121,10 +120,8 @@ void sort_numbers(double *numbers)
 }
 
 int main(int argc, char *argv[]){
-    setlocale (LC_ALL, "rus");
-
     if (!flag_check(argv[1])){
-        printf ("Введен неправильный флаг.\n");
+        printf ("Wrong flag.\n");
         return 0;
     }
 
@@ -133,15 +130,15 @@ int main(int argc, char *argv[]){
     switch(flag){
         case 'q':
             if (argc != 6){
-                printf("Введено недостаточно аргументов. Необходимо ввести точность сравнения и три числа.");
+                printf("Not enough args.\n");
                 return 0;
             }
             if (!number_check(argv[3]) ||  !number_check(argv[4]) || !number_check(argv[5]) || number_check(argv[2]) == 2 || !number_check(argv[2])){
-                printf ("Необходимо ввести целое неотрицательное значение точности и три неотрицательных вещественных числа");
+                printf ("Wrong numbers.\n");
                 return 0;
             }
             if (argv[2][0] == '-'){
-                printf ("Необходимо ввести неотрицательное значение точности");
+                printf ("Wrong eps.\n");
                 return 0;
             }
             double point_q = atof(argv[2]);
@@ -157,38 +154,38 @@ int main(int argc, char *argv[]){
             break;
         case 'm':
             if (argc != 4){
-                printf("Введено слишком много или недостаточно аргументов. Необходимо ввести два целых ненулевых числа.");
+                printf("Wrong number of args.\n");
                 return 0;
             }
             if (number_check(argv[2]) == 0 ||  number_check(argv[3]) == 0){
-                printf ("Одно или два числа введены в неверной форме");
+                printf ("Wrong numbers.\n");
                 return 0;
             }
             if (number_check(argv[2]) == 2 ||  number_check(argv[3]) == 2){
-                printf ("Необходимо ввести целые ненулевые числа");
+                printf ("Wrong numbers.\n");
                 return 0;
             }
             int number_1 = atoi(argv[2]);
             int number_2 = atoi(argv[3]);
-            if (flag_m(number_1, number_2) == 2) { printf ("Одно или два числа не подходят для обработки");}
+            if (flag_m(number_1, number_2) == 2) { printf ("Wrong numbers.\n");}
             else if (!flag_m(number_1, number_2)){
-                printf ("Первое число не кратно второму");
+                printf ("First number is not multiple of the second.\n");
             }
             else { 
-                printf("Первое число кратно второму");
+                printf("First number is multiple of the second.\n");
             }
             break;
         case 't':
             if (argc != 6){
-                printf("Введено слишком много или недостаточно аргументов. Необходимо ввести точность сравнения и три числа.");
+                printf("Wrong number of args.\n");
                 return 0;
             }
             if (!number_check(argv[3]) ||  !number_check(argv[4]) || !number_check(argv[5]) || number_check(argv[2]) == 2 || !number_check(argv[2])){
-                printf ("Необходимо ввести целое неотрицательное значение точности и три неотрицательных вещественных числа");
+                printf ("Wrong numbers.\n");
                 return 0;
             }
             if (argv[2][0] == '-' || argv[3][0] == '-' || argv[4][0] == '-' || argv[5][0] == '-'){
-                printf ("Необходимо ввести неотрицательное значение точности и три неотрицательных вещественных числа");
+                printf ("Wrong numbers.\n");
                 return 0;
             }
             double point_t = atof(argv[2]);
@@ -197,9 +194,9 @@ int main(int argc, char *argv[]){
             double side_2 = atof(argv[4]);
             double side_3 = atof(argv[5]);
             if (!flag_t(eps_2, side_1, side_2, side_3)){
-                printf ("Числа не являются длинами сторон прямоугольного треугольника");
+                printf ("Numbers are not sides of a triangle.\n");
             }
-            else {printf ("Числа являются длинами сторон прямоугольного треугольника");}
+            else {printf ("Numbers are sides of a triangle.\n");}
             break;
     }
     return 0;

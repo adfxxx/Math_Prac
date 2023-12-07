@@ -2,7 +2,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <locale.h>
 
 #define pi 3.14
 
@@ -273,13 +272,12 @@ double gamma_newton(double eps){
 
 
 int main (int argc, char *argv[]){
-    setlocale (LC_ALL, "rus");
-
     if (argc != 2){
-        printf("Необходимо ввести один аргумент: точность вычислений");
+        printf("You must enter 1 argument.\n");
+        return 0;
     }
     if (!number_check(argv[1])){
-        printf ("Введено неправильное число. Число не должно содержать лишних символов в своей записи.\n");
+        printf ("Wrong number.\n");
         return 0;
     }
     

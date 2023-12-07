@@ -26,7 +26,7 @@ int flag_check(char *flag){
     return 0;
 }
 
-void output_name (char *input, int length, char *end, int length_end, char **output){
+int output_name (char *input, int length, char *end, int length_end, char **output){
     int position = 0;
     char *end_input;
     for (int i = length; i > 0 ; --i){
@@ -36,23 +36,30 @@ void output_name (char *input, int length, char *end, int length_end, char **out
         }
     }
     *output = (char*)malloc(sizeof(char)*(length_end + length + 1));
+    if(*output == NULL){
+        return 0;
+    }
     if (position == 0){
         memcpy(*output, end, length_end);
         memcpy(*output + length_end, input, length+1);
     }
     else{
         end_input = (char*)malloc(sizeof(char)*(length-position));
+        if(end_input == NULL){
+            free(*output);
+            return 0;
+        }
         int k = 0;
         for (int i = position; i <= length; ++i){
             end_input[k] = input[i];
             k++;
         }
-
         memcpy(*output, input, position);
         memcpy(*output + position, end, length_end);
         memcpy(*output + length_end + position, end_input, length-position+2);
         free(end_input);
     }
+    return 1;
 }
 
 void flag_d (FILE *input, FILE *output){
@@ -96,7 +103,6 @@ void flag_s (FILE *input, FILE *output){
             }
         }
         else{
-            //fputs ("Number ", output);
             fprintf(output, "Number: %d\n", count);
             count = 0;
         }
@@ -142,7 +148,10 @@ int main (int argc, char *argv[]){
             char *end= "out_";
             int length_end = strlen(end);
             int length = strlen(input);
-            output_name(input, length, end, length_end, &output);
+            if(output_name(input, length, end, length_end, &output) == 0){
+                printf("Memory error.\n");
+                return 0;
+            }
             flag = argv[1][2];
         }
         else{
@@ -181,9 +190,6 @@ int main (int argc, char *argv[]){
             printf("Sucessful output");
             break;
     }
-    //for (int i = 0; i < strlen(output); i++){
-    //    free(&output[i]);
-    //}
     free(output);
     fclose(input_file);
     fclose(output_file);
