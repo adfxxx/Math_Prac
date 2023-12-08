@@ -6,7 +6,8 @@
 
 enum errors{
     success = 1,
-    wrong_input = -2
+    wrong_input = -2,
+    memory_error = -3
 };
 
 int to_10 (int length, char *element, int base){
@@ -85,11 +86,11 @@ int main (){
     printf("Input system: ");
     int base = 0;
     if (!(scanf("%d", &base))){
-        printf("Input must be a number");
+        printf("Input must be a number.\n");
         return wrong_input;
     }
     if (base < 2 || base > 36){
-        printf("System must be a number between 2 and 36");
+        printf("System must be a number between 2 and 36.\n");
         return wrong_input;
     }
     char element[30] = {0};
@@ -111,41 +112,57 @@ int main (){
         }
     } while(strcmp(element, "Stop"));
     if (max_element == 0){
-        printf("There are no good numbers");
+        printf("There are no good numbers.\n");
         return wrong_input;
     }
     char *orig_elem = malloc(sizeof(char)*size);
+    if(orig_elem == NULL){
+        printf("Memory error.\n");
+        return memory_error;
+    }
     int count = to_18_36_base(max_element, orig_elem, base);
     printf("\nMax number %d - ", max_element);
     for (int i = count-1; i >= 0; --i){
         printf("%c", orig_elem[i]);
     }
+    free(orig_elem);
 
     printf("\nMax number in 9: %d\n", to_9_base(max_element));
 
     char *answer_18 = malloc(sizeof(char)*size);
+    if(answer_18 == NULL){
+        printf("Memory error.\n");
+        return memory_error;
+    }
     count = to_18_36_base(max_element, answer_18, 18);
     printf("Max number in 18: ");
     for (int i = count-1; i >= 0; --i){
         printf("%c", answer_18[i]);
     }
-
+    free(answer_18);
+    
     char *answer_27 = malloc(sizeof(char)*size);
+    if(answer_27 == NULL){
+        printf("Memory error.\n");
+        return memory_error;
+    }
     count = to_18_36_base(max_element, answer_27, 27);
     printf("\nMax number in 27: ");
     for (int i = count-1; i >= 0; --i){
         printf("%c", answer_27[i]);
     }
+    free(answer_27);
 
     char *answer_36 = malloc(sizeof(char)*size);
+    if(answer_36 == NULL){
+        printf("Memory error.\n");
+        return memory_error;
+    }
     count = to_18_36_base(max_element, answer_36, 36);
     printf("\nMax number in 36: ");
     for (int i = count-1; i >= 0; --i){
         printf("%c", answer_36[i]);
     }
-
-    free(answer_18);
-    free(answer_27);
     free(answer_36);
-    return 0;
+    return success;
 }
