@@ -8,7 +8,8 @@
 enum errors{
     success = 1,
     wrong_amount = -1,
-    wrong_input = -2
+    wrong_input = -2,
+    memory_error = -3
 };
 
 void fill_random (int *numbers, int a, int b, int length){
@@ -88,6 +89,10 @@ int main(int argc, char *argv[]){
     int a = atoi(argv[2]);
     int b = atoi(argv[3]);
     int *numbers = malloc(sizeof(int)*length);
+    if(numbers == NULL){
+        printf(memory_error);
+        return memory_error;
+    }
 
     if(a > b){
         int temp = b;
@@ -107,11 +112,26 @@ int main(int argc, char *argv[]){
     }
     free(numbers);
 
-    int length_a = 5;//get_random_num(10, 10000);
+    int length_a = get_random_num(10, 10000);
     int *arr_a = malloc(sizeof(int)*length_a);
-    int length_b = 3;//get_random_num(10, 10000);
+    if(arr_a == NULL){
+        printf(memory_error);
+        return memory_error;
+    }
+    int length_b = get_random_num(10, 10000);
     int *arr_b = malloc(sizeof(int)*length_b);
+    if(arr_b == NULL){
+        free(arr_a);
+        printf(memory_error);
+        return memory_error;
+    }
     int *arr_c = malloc(sizeof(int)*length_a);
+    if(arr_c == NULL){
+        free(arr_a);
+        free(arr_b);
+        printf(memory_error);
+        return memory_error;
+    }
 
     fill_random(arr_a, -1000, 1000, length_a);
     fill_random(arr_b, -1000, 1000, length_b);
@@ -132,4 +152,6 @@ int main(int argc, char *argv[]){
     free(arr_a);
     free(arr_b);
     free(arr_c);
+
+    return success;
 }
