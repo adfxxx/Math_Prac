@@ -8,7 +8,8 @@ enum errors{
     success = 1,
     wrong_amount = -1,
     wrong_flag = -2,
-    not_open = -3
+    not_open = -3,
+    memory_error = -4
 };
 
 int flag_check(char *flag){
@@ -32,10 +33,13 @@ long get_file_length(FILE *file){
     return length;
 }
 
-void get_file(FILE *file, char **list, int length){
+int get_file(FILE *file, char **list, int length){
     int i = 0;
     char symbol = 0;
     char *list_temp = malloc(sizeof(char)*length);
+    if(list == NULL){
+        return memory_error;
+    }
     (*list) = list_temp;
     while((symbol = fgetc(file)) != EOF){
         if (symbol != ',' && symbol != '.' && symbol != ' ' && symbol != '\0' && symbol != '\n'){
@@ -48,15 +52,23 @@ void get_file(FILE *file, char **list, int length){
         }
     }
     (*list)[i] = '\0';
+    return success;
 }
 
-void flag_r (FILE *file_1, FILE *file_2, FILE *file_out){
+int flag_r (FILE *file_1, FILE *file_2, FILE *file_out){
     int length_1 = get_file_length(file_1);
     int length_2 = get_file_length(file_2);
     char *list_1 = NULL;
     char *list_2 = NULL;
-    get_file(file_1, &list_1, length_1);
-    get_file(file_2, &list_2, length_2);
+    int result = get_file(file_1, &list_1, length_1);
+    if(result == memory_error){
+        return memory_error;
+    }
+    result = get_file(file_2, &list_2, length_2);
+    if(result == memory_error){
+        free(list_1);
+        return memory_error;
+    }
     int j = 0;
     int k = 0;
     if (length_1 > length_2){
@@ -105,6 +117,7 @@ void flag_r (FILE *file_1, FILE *file_2, FILE *file_out){
         free(list_1);
         free(list_2);  
     }
+    return success;
 }
 
 int to_base_4(int number){
@@ -122,10 +135,13 @@ int to_base_4(int number){
     return total;
 }
 
-void flag_a (FILE* file, FILE* file_out){
+int flag_a (FILE* file, FILE* file_out){
     int length = get_file_length(file);
     char *list = NULL;
-    get_file(file, &list, length);
+    int result = get_file(file, &list, length);
+    if(result == memory_error){
+        return memory_error;
+    }
     int count = 1;
     char symbol = 0;
     for (int i = 0; i < length; ++i){
@@ -162,6 +178,7 @@ void flag_a (FILE* file, FILE* file_out){
         }
     }
     free(list);
+    return success;
 }
 
 int main(int argc, char *argv[]){
@@ -190,13 +207,20 @@ int main(int argc, char *argv[]){
                 printf("File is not open");
                 return not_open;
             }
-            flag_r(file_1, file_2, file_out);
-            printf("Success");
-            fclose(file_1);
-            fclose (file_2);
-            fclose (file_out);
+            if(flag_r(file_1, file_2, file_out) == memory_error){
+                fclose(file_1);
+                fclose (file_2);
+                fclose (file_out);
+                printf("Memory error.\n");
+                return memory_error;
+            }
+            else{
+                printf("Success");
+                fclose(file_1);
+                fclose (file_2);
+                fclose (file_out);
+            }
             break;
-
         case 'a':
             if(argc != 4){
                 printf("Wrong amount of arguments");
@@ -210,11 +234,18 @@ int main(int argc, char *argv[]){
                 printf("File is not open");
                 return not_open;
             }
-            flag_a(file, out_file);
-            printf("Success");
-            fclose (file);
-            fclose (out_file);
+            if(flag_a(file, out_file) == memory_error){
+                printf("Memory error.\n");
+                fclose (file);
+                fclose (out_file);
+                return memory_error;
+            }
+            else{
+                printf("Success");
+                fclose (file);
+                fclose (out_file);
+            }
             break;
     }
-    return 0;
+    return success;
 }
