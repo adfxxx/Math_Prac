@@ -130,20 +130,20 @@ int function (FILE* file, FILE* out_file){
 
 int main(int argc, char *argv[]){
     if (argc != 3){
-        printf("Wrong amount of arguments");
+        printf("Wrong amount of arguments.\n");
         return wrong_amount;
     }
     
     FILE *file = fopen(argv[1], "r");
     FILE *out_file = fopen(argv[2], "w");
     if(!file || !out_file){
-    printf("File is not open");
+    printf("File is not open.\n");
         return not_open;
     }
-    if(function(file, out_file)){
-        printf("success");
+    if(function(file, out_file) == success){
+        printf("success.\n");
     }
-    else {printf("fail");}
+    else {printf("memory error.\n");}
 
     fclose(file);
     fclose(out_file);
