@@ -16,10 +16,6 @@ int main(){
     double C[] = {1.0, 1.0};
     double D[] = {2.0, 1.0};
     double E[] = {1.33, 5.1};
-    // if(check_convex(5, A, B, C, D, E) == success){
-    //     printf("Is polygon convex: Yes\n");
-        
-    // }
 
     if(check_convex(5, B, D, E, C, A) == success){
         printf("Is polygon convex: Yes\n");

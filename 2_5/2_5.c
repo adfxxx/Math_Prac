@@ -81,10 +81,6 @@ void oversprintf(char *buf, const char *format, ...){
                         if (format[i + 2] == 'f') {
                             va_arg(args, double);
                         } 
-                        // else if (result[j - 1] == 'n') {
-                        //     flag = va_arg(args, int*);
-                        //     *flag = counter;
-                        // }
                         else{
                             va_arg(args, void*);
                         }
@@ -147,7 +143,6 @@ void overfprintf(FILE *stream, const char *format, ...){
     int check = 0;
     int count = 0;
     int *flag;
-    int counter = 0;
     char *result = (char*)malloc((length+1)*sizeof(char));
     if(result == NULL){
         va_end(args);
@@ -156,7 +151,7 @@ void overfprintf(FILE *stream, const char *format, ...){
     }
     for(int i = 0; i < length; i++){
         if(format[i] == '%'){
-            if(check_flag(format[i+1], format[i+2]) == success || format[i+1] == 'n'){
+            if(check_flag(format[i+1], format[i+2]) == success){
                 if(i != 0){
                     result[j] = '\0';
                     check = vfprintf(stream, result, args);
@@ -171,12 +166,6 @@ void overfprintf(FILE *stream, const char *format, ...){
                         if (result[j - 1] == 'f'){
                             va_arg(args, double);
                         } 
-                        /* 
-                        else if (result[j - 1] == 'n') {
-                            flag = va_arg(args, int*);
-                            //*flag = counter;
-                        }
-                        */
                         else{
                             va_arg(args, void*);
                         } 
@@ -196,7 +185,6 @@ void overfprintf(FILE *stream, const char *format, ...){
         }
         result[j] = format[i];
         j++;
-        counter++;
     }
     if (j != 0) {
         result[j] = '\0';

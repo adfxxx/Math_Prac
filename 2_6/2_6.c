@@ -34,7 +34,6 @@ int main(){
     int number_cV;
     int base = 16;
 
-/* 
     result = overfscanf(file, "%Ro %Zr %Cv %CV", &number_ro, &number_zr, &number_cv, base, &number_cV, base);
     if(result == success){
         printf("Roman: %d, zeckendorf: %u, in base 10(low): %d, in base 10(high): %d\n", number_ro, number_zr, number_cv, number_cV);
@@ -50,7 +49,6 @@ int main(){
     else{
         printf("Error");
     }
-    */
     return success;
 }
 
