@@ -404,7 +404,7 @@ int change_command(List *routes, double *coord, int count){
                 printf("The list is empty\n");
             }
             else{
-                if(find_routes_number(routes, &max_stop, &min_stop) == memory_error){
+                if(find_longest_way(routes, &max_stop, &min_stop) == memory_error){
                     free_list(max_stop);
                     free_list(min_stop);
                     return memory_error;
