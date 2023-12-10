@@ -22,7 +22,6 @@ enum states{
 };
 
 typedef struct Liver{
-    int error;
     char *name;
     char *surname;
     char *patronymic;
@@ -60,7 +59,7 @@ int change_liver(Liver *liver, int option, List *list);
 int add_changing(List *list, Liver *old_liver, Liver *new_liver, int operation, int option);
 void free_changes(Changes *change);
 void write_to_file(const List *list, FILE *output);
-Liver *find_liver(const List *list, const char *name, const char *surname, const char *patronymic, int day, int month, int year, char gender, double salary, double eps);
+int find_liver(const List *list, const char *name, const char *surname, const char *patronymic, int day, int month, int year, char gender, double salary, double eps, Liver **found);
 void print_list(const List *list);
 int read_file(FILE *input, List *list);
 void add_liver_to_list(List *list, Liver *new_liver);
@@ -159,11 +158,11 @@ int main(){
                 print(wrong_input);
             }
             else{
-                res = find_liver(&list, name, surname, patronymic, day, month, year, gender, salary, eps);
-                if(res->error == eps_error){
+                result = find_liver(&list, name, surname, patronymic, day, month, year, gender, salary, eps, &temp);
+                if(result == eps_error){
                     printf("Wrong eps.\n");
                 }
-                else if(res->error == not_found){
+                else if(result == not_found){
                     printf("\nThe liver is not in the system.\n");
                 }
                 else{
@@ -197,11 +196,11 @@ int main(){
                 break;
             }
             else{
-                res = find_liver(&list, name, surname, patronymic, day, month, year, gender, salary, eps);
-                if(res->error == eps_error){
+                result = find_liver(&list, name, surname, patronymic, day, month, year, gender, salary, eps, &temp);
+                if(result == eps_error){
                     printf("Wrong eps.\n");
                 }
-                else if(res->error == not_found){
+                else if(result == not_found){
                     printf("\nThe liver is not in the system.\n");
                 }
                 else{
@@ -212,7 +211,7 @@ int main(){
                         break;
                     }
                     printf("\nEnter new information: ");
-                    result = change_liver(res, check, &list);
+                    result = change_liver(temp, check, &list);
                     if(result == memory_error){
                         print(memory_error);
                         break;
@@ -249,11 +248,11 @@ int main(){
                 break;
             }
             else{
-                temp = find_liver(&list, name, surname, patronymic, day, month, year, gender, salary, eps);
-                if(temp->error == eps_error){
+                result = find_liver(&list, name, surname, patronymic, day, month, year, gender, salary, eps, &temp);
+                if(result == eps_error){
                     printf("Wrong eps.\n");
                 }
-                else if(temp->error == success){
+                else if(result == success){
                     printf("Liver is in the system already.\n");
                 }
                 else{
@@ -296,16 +295,16 @@ int main(){
                 break;
             }
             else{
-                res = find_liver(&list, name, surname, patronymic, day, month, year, gender, salary, eps);
-                if(res->error == eps_error){
+                result = find_liver(&list, name, surname, patronymic, day, month, year, gender, salary, eps, &temp);
+                if(result == eps_error){
                     printf("Wrong eps.\n");
                 }
-                else if(res->error == not_found){
+                else if(result == not_found){
                     printf("\nThe liver is not in the system.\n");
                 }
                 else{
-                    add_changing(&list, res, NULL, 2, 0);
-                    remove_liver(&list, res);
+                    add_changing(&list, temp, NULL, 2, 0);
+                    remove_liver(&list, temp);
                     printf("\nSuccessful removing.\n");
                     number++;
                 }
@@ -713,26 +712,23 @@ void write_to_file(const List *list, FILE *output){
     }
 }
 
-Liver *find_liver(const List *list, const char *name, const char *surname, const char *patronymic, int day, int month, int year, char gender, double salary, double eps){
+int find_liver(const List *list, const char *name, const char *surname, const char *patronymic, int day, int month, int year, char gender, double salary, double eps, Liver **found){
     Liver *error;
     if(list->head == NULL){
-        error->error = empty_list;
-        return error;
+        return empty_list;
     }
     Liver *cur = list->head;
     if(eps <= 0){
-        error->error = eps_error;
-        return error;
+        return eps_error;
     }
     while(cur != NULL){
         if(!strcmp(cur->name, name) && !strcmp(cur->surname, surname) && !strcmp(cur->patronymic, patronymic) && cur->day == day && cur->month == month && cur->year == year && cur->gender == gender && fabs(cur->salary - salary) < eps){
-            cur->error = success;
-            return cur;
+            (*found) = cur;
+            return success;
         }
         cur = cur->next;
     }
-    error->error = not_found;
-    return error;
+    return not_found;
 }
 
 void print_list(const List *list){
