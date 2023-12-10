@@ -30,7 +30,6 @@ typedef struct Monom{
 }Monom;
 
 typedef struct Polynom{
-    int error;
     Monom *head;
     struct Polynom *next;
 }Polynom;
@@ -45,16 +44,16 @@ Polynom copy_poly(const Polynom *poly);
 void free_polynom(Polynom *poly);
 int command_check(const char *command);
 int change_command(int command, Polynom **polynoms, Polynom *summator, int count);
-Polynom add_poly(Polynom *poly_1, Polynom *poly_2);
-Polynom sub_poly(Polynom *poly_2, Polynom *poly_1);
-Polynom mult_poly(Polynom *poly_1, Polynom *poly_2);
+int add_poly(Polynom *poly_1, Polynom *poly_2, Polynom **temp);
+int sub_poly(Polynom *poly_1, Polynom *poly_2, Polynom **answer);
+int mult_poly(Polynom *poly_1, Polynom *poly_2, Polynom **answer);
 void combine_monoms(Polynom *poly);
 void sort_poly(Polynom *poly);
-Polynom div_poly(Polynom *poly_1, Polynom *poly_2);
-Polynom mod_poly(Polynom *poly_1, Polynom *poly_2);
+int div_poly(Polynom *poly_1, Polynom *poly_2, Polynom **answer);
+int mod_poly(Polynom *poly_1, Polynom *poly_2, Polynom **answer);
 int eval_poly(Polynom *poly_1, Polynom *poly_2);
-Polynom diff_poly(Polynom *poly);
-Polynom cmps_poly(Polynom *poly_1, Polynom *poly_2);
+int diff_poly(Polynom *poly, Polynom **answer);
+int cmps_poly(Polynom *poly_1, Polynom *poly_2, Polynom **temp);
 void print_poly(Polynom *poly);
 void print(int state);
 
@@ -364,40 +363,31 @@ void reverse(char *line){
 }
 
 int change_command(int command, Polynom **polynoms, Polynom *summator, int count){
-    Polynom temp;
+    Polynom *temp;
+    Polynom save;
     int result = 0;
     switch(command){
         case add:
         if(*polynoms != NULL){
             if(count == 1){
-                (*summator) = add_poly(*polynoms, summator);
-                if(summator->error == 1){
-                    free_polynom(summator);
-                    free_polynom(*polynoms);
-                    return memory_error;
-                }
-                sort_poly(summator);
-                printf("Result of add: ");
-                print_poly(summator);
-                printf("\n");
+                result = add_poly(*polynoms, summator, &temp);
             }
             else{
-                (*summator) = add_poly(*polynoms, (*polynoms)->next);
-                if(summator->error == 1){
-                    free_polynom(summator);
-                    free_polynom(*polynoms);
-                    return memory_error;
-                }
-                sort_poly(summator);
-                printf("Result of add: ");
-                print_poly(summator);
-                printf("\n");
+                result = add_poly(*polynoms, (*polynoms)->next, &temp);
             }
-            temp = copy_poly(summator);
-            sort_poly(&temp);
+            if(result == memory_error){
+                free_polynom(summator);
+                free_polynom(*polynoms);
+                return memory_error;
+            }
+            (*summator) = copy_poly(temp);
+            sort_poly(summator);
+            printf("Result of add: ");
+            print_poly(summator);
+            printf("\n");
+            save = copy_poly(summator);
             free_polynom(*polynoms);
-            (*summator) = temp;
-            summator->error = 0;
+            (*summator) = save;
         }
         else{
             printf("There are no polynoms to add.\n");
@@ -406,34 +396,24 @@ int change_command(int command, Polynom **polynoms, Polynom *summator, int count
         case sub:
         if(*polynoms != NULL){
             if(count == 1){
-                (*summator) = sub_poly(summator, *polynoms);
-                if(summator->error == 1){
-                    free_polynom(summator);
-                    free_polynom(*polynoms);
-                    return memory_error;
-                }
-                sort_poly(summator);
-                printf("Result of sub: ");
-                print_poly(summator);
-                printf("\n");
+                result = sub_poly(summator, *polynoms, &temp);
             }
             else{
-                (*summator) = sub_poly((*polynoms)->next, *polynoms);
-                if(summator->error == 1){
-                    free_polynom(summator);
-                    free_polynom(*polynoms);
-                    return memory_error;
-                }
-                sort_poly(summator);
-                printf("Result of sub: ");
-                print_poly(summator);
-                printf("\n");
+                result = sub_poly((*polynoms)->next, *polynoms, &temp);
             }
-            temp = copy_poly(summator);
-            sort_poly(&temp);
+            if(result == memory_error){
+                free_polynom(summator);
+                free_polynom(*polynoms);
+                return memory_error;
+            }
+            (*summator) = *temp;
+            sort_poly(summator);
+            printf("Result of sub: ");
+            print_poly(summator);
+            printf("\n");
+            save = copy_poly(summator);
             free_polynom(*polynoms);
-            (*summator) = temp;
-            summator->error = 0;
+            (*summator) = save;
         }
         else{
             printf("There are no polynoms to sub.\n");
@@ -442,34 +422,24 @@ int change_command(int command, Polynom **polynoms, Polynom *summator, int count
         case mult:
         if(*polynoms != NULL){
             if(count == 1){
-                (*summator) = mult_poly(*polynoms, summator);
-                if(summator->error == 1){
-                    free_polynom(summator);
-                    free_polynom(*polynoms);
-                    return memory_error;
-                }
-                sort_poly(summator);
-                printf("Result of mult: ");
-                print_poly(summator);
-                printf("\n");
+                result = mult_poly(*polynoms, summator, &temp);
             }
             else{
-                (*summator) = mult_poly(*polynoms, (*polynoms)->next);
-                if(summator->error == 1){
-                    free_polynom(summator);
-                    free_polynom(*polynoms);
-                    return memory_error;
-                }
-                sort_poly(summator);
-                printf("Result of mult: ");
-                print_poly(summator);
-                printf("\n");
+                result = mult_poly(*polynoms, (*polynoms)->next, &temp);
             }
-            temp = copy_poly(summator);
-            sort_poly(&temp);
+            if(result == memory_error){
+                free_polynom(summator);
+                free_polynom(*polynoms);
+                return memory_error;
+            }
+            (*summator) = copy_poly(temp);
+            sort_poly(summator);
+            printf("Result of mult: ");
+            print_poly(summator);
+            printf("\n");
+            save = copy_poly(summator);
             free_polynom(*polynoms);
-            (*summator) = temp;
-            summator->error = 0;
+            (*summator) = save;
         }
         else{
             printf("There are no polynoms to mult.\n");
@@ -482,21 +452,7 @@ int change_command(int command, Polynom **polynoms, Polynom *summator, int count
                     printf("Result of div: 0\n");
                 }
                 else{
-                    (*summator) = div_poly(summator, *polynoms);
-                    if(summator->error == 1){
-                        free_polynom(summator);
-                        free_polynom(*polynoms);
-                        return memory_error;
-                    }
-                    else if(summator->error == 2){
-                        summator->error = 0;
-                    }
-                    else{
-                        sort_poly(summator);
-                        printf("Result of div: ");
-                        print_poly(summator);
-                        printf("\n");
-                    }
+                    result = div_poly(summator, *polynoms, &temp);
                 }
             }
             else{
@@ -504,28 +460,24 @@ int change_command(int command, Polynom **polynoms, Polynom *summator, int count
                     printf("Result of div: wrong input - division by zero.");
                 }
                 else{
-                    (*summator) = div_poly((*polynoms)->next, *polynoms);
-                    if(summator->error == 1){
-                        free_polynom(summator);
-                        free_polynom(*polynoms);
-                        return memory_error;
-                    }
-                    else if(summator->error == 2){
-                        summator->error = 0;
-                    }
-                    else{
-                        sort_poly(summator);
-                        printf("Result of div: ");
-                        print_poly(summator);
-                        printf("\n");
-                    }
+                    result = div_poly((*polynoms)->next, *polynoms, &temp);
                 }
             }
-            temp = copy_poly(summator);
-            sort_poly(&temp);
-            free_polynom(*polynoms);
-            (*summator) = temp;
-            summator->error = 0;
+            if(result == memory_error){
+                free_polynom(summator);
+                free_polynom(*polynoms);
+                return memory_error;
+            }
+            else if(result == success){
+                (*summator) = *temp;
+                sort_poly(summator);
+                printf("Result of div: ");
+                print_poly(summator);
+                printf("\n");
+                save = copy_poly(summator);
+                free_polynom(*polynoms);
+                (*summator) = save;
+            }
         }
         else{
             printf("There are no polynoms to div.\n");
@@ -538,21 +490,7 @@ int change_command(int command, Polynom **polynoms, Polynom *summator, int count
                     printf("Result of mod: 0\n");
                 }
                 else{
-                    (*summator) = mod_poly(summator, *polynoms);
-                    if(summator->error == 1){
-                        free_polynom(summator);
-                        free_polynom(*polynoms);
-                        return memory_error;
-                    }
-                    else if(summator->error == 2){
-                        summator->error = 0;
-                    }
-                    else{
-                        sort_poly(summator);
-                        printf("Result of mod: ");
-                        print_poly(summator);
-                        printf("\n");
-                    }
+                    result = mod_poly(summator, *polynoms, &temp);
                 }
             }
             else{
@@ -560,28 +498,24 @@ int change_command(int command, Polynom **polynoms, Polynom *summator, int count
                     printf("Result of mod: wrong input - division by zero.");
                 }
                 else{
-                    (*summator) = mod_poly((*polynoms)->next, *polynoms);
-                    if(summator->error == 1){
-                        free_polynom(summator);
-                        free_polynom(*polynoms);
-                        return memory_error;
-                    }
-                    else if(summator->error == 2){
-                        summator->error = 0;
-                    }
-                    else{
-                        sort_poly(summator);
-                        printf("Result of mod: ");
-                        print_poly(summator);
-                        printf("\n");
-                    }
+                    result = mod_poly((*polynoms)->next, *polynoms, &temp);
                 }
             }
-            temp = copy_poly(summator);
-            sort_poly(&temp);
-            free_polynom(*polynoms);
-            (*summator) = temp;
-            summator->error = 0;
+            if(result == memory_error){
+                free_polynom(summator);
+                free_polynom(*polynoms);
+                return memory_error;
+            }
+            else if(result == success){
+                (*summator) = *temp;
+                sort_poly(summator);
+                printf("Result of mod: ");
+                print_poly(summator);
+                printf("\n");
+                save = copy_poly(summator);
+                free_polynom(*polynoms);
+                (*summator) = save;
+            }
         }
         else{
             printf("There are no polynoms to mod.\n");
@@ -609,37 +543,27 @@ int change_command(int command, Polynom **polynoms, Polynom *summator, int count
         case diff:
         if(*polynoms != NULL){
             if(count == 0){
-                (*summator) = diff_poly(summator);
-                if(summator->error == 1){
-                    free_polynom(summator);
-                    free_polynom(*polynoms);
-                    return memory_error;
-                }
-                sort_poly(summator);
-                printf("Result of diff: ");
-                print_poly(summator);
-                printf("\n");
+                result = diff_poly(summator, &temp);
             }
             else if(count == 1){
-                (*summator) = diff_poly(*polynoms);
-                if(summator->error == 1){
-                    free_polynom(summator);
-                    free_polynom(*polynoms);
-                    return memory_error;
-                }
-                sort_poly(summator);
-                printf("Result of diff: ");
-                print_poly(summator);
-                printf("\n");
+                result = diff_poly(*polynoms, &temp);
             }
             else{
                 printf("Too many polinoms for fuction");
             }
-            temp = copy_poly(summator);
-            sort_poly(&temp);
+            if(result == memory_error){
+                free_polynom(summator);
+                free_polynom(*polynoms);
+                return memory_error;
+            }
+            (*summator) = *temp;
+            sort_poly(summator);
+            printf("Result of diff: ");
+            print_poly(summator);
+            printf("\n");
+            save = copy_poly(summator);
             free_polynom(*polynoms);
-            (*summator) = temp;
-            summator->error = 0;
+            (*summator) = save;
         }
         else{
             printf("There are no polynoms to mod.\n");
@@ -648,34 +572,24 @@ int change_command(int command, Polynom **polynoms, Polynom *summator, int count
         case cmps:
         if(*polynoms != NULL){
             if(count == 1){
-                (*summator) = cmps_poly(summator, *polynoms);
-                if(summator->error == 1){
-                    free_polynom(summator);
-                    free_polynom(*polynoms);
-                    return memory_error;
-                }
-                sort_poly(summator);
-                printf("Result of cmps: ");
-                print_poly(summator);
-                printf("\n");
+                result = cmps_poly(summator, *polynoms, &temp);
             }
             else{
-                (*summator) = cmps_poly((*polynoms)->next, *polynoms);
-                if(summator->error == 1){
-                    free_polynom(summator);
-                    free_polynom(*polynoms);
-                    return memory_error;
-                }
-                sort_poly(summator);
-                printf("Result of cmps: ");
-                print_poly(summator);
-                printf("\n");
+                result = cmps_poly((*polynoms)->next, *polynoms, &temp);
             }
-            temp = copy_poly(summator);
-            sort_poly(&temp);
+            if(result == memory_error){
+                free_polynom(summator);
+                free_polynom(*polynoms);
+                return memory_error;
+            }
+            (*summator) = *temp;
+            sort_poly(summator);
+            printf("Result of cmps: ");
+            print_poly(summator);
+            printf("\n");
+            save = copy_poly(summator);
             free_polynom(*polynoms);
-            (*summator) = temp;
-            summator->error = 0;
+            (*summator) = save;
         }
         else{
             printf("There are no polynoms to cmps.\n");
@@ -684,17 +598,17 @@ int change_command(int command, Polynom **polynoms, Polynom *summator, int count
     }
 }
 
-Polynom cmps_poly(Polynom *poly_1, Polynom *poly_2){
+int cmps_poly(Polynom *poly_1, Polynom *poly_2, Polynom **answer){
     int check;
     sort_poly(poly_1);
     Polynom result;
     create_polynom(&result);
     Polynom temp;
+    Polynom *temp_2;
     create_polynom(&temp);
     check = add_monom(1, 0, &temp);
     if(check == memory_error){
-        result.error = 1;
-        return result;
+        return memory_error;
     }
     Monom *cur_1 = poly_1->head;
     Polynom temp_result;
@@ -702,7 +616,14 @@ Polynom cmps_poly(Polynom *poly_1, Polynom *poly_2){
     create_polynom(&coef);
     while(cur_1 != NULL){
         for(int i = 0; i < cur_1->power; i++){
-            temp = mult_poly(poly_2, &temp);
+            check = mult_poly(poly_2, &temp, &temp_2);
+            if(check == memory_error){
+                free_polynom(&coef);
+                free_polynom(&temp);
+                free_polynom(&result);
+                return memory_error;
+            }
+            temp = copy_poly(temp_2);
         }
         if(cur_1->power == 1){
             temp = *poly_2;
@@ -711,44 +632,58 @@ Polynom cmps_poly(Polynom *poly_1, Polynom *poly_2){
             free_polynom(&temp);
             check = add_monom(cur_1->coef, 0, &temp);
             if(check == memory_error){
-                result.error = 1;
-                return result;
+                return memory_error;
             }
         }
         if(cur_1->power != 0){
             check = add_monom(cur_1->coef, 0, &coef);
             if(check == memory_error){
-                result.error = 1;
-                return result;
+                return memory_error;
             }
-            temp_result = mult_poly(&temp, &coef);
+            check = mult_poly(&temp, &coef, &temp_2);
+            if(check == memory_error){
+                free_polynom(&coef);
+                free_polynom(&temp);
+                free_polynom(&result);
+                return memory_error;
+            }
+            temp_result = copy_poly(temp_2);
             temp = copy_poly(&temp_result);
             free_polynom(&temp_result);
         }
         temp_result = copy_poly(&result);
         free_polynom(&result);
-        result = add_poly(&temp, &temp_result);
+        check = add_poly(&temp, &temp_result, &temp_2);
+        if(check == memory_error){
+            return memory_error;
+        }
+        result = copy_poly(temp_2);
         sort_poly(&result);
         free_polynom(&coef);
         free_polynom(&temp);
         check = add_monom(1, 0, &temp);
         if(check == memory_error){
-            result.error = 1;
-            return result;
+            return memory_error;
         }
         free_polynom(&temp_result);
         cur_1 = cur_1->next;
     }
     combine_monoms(&result);
-    return result;
+    (*answer) = &result;
+    return success;
 }
 
-Polynom diff_poly(Polynom *poly){
+int diff_poly(Polynom *poly, Polynom **answer){
     Polynom result;
+    int check;
     create_polynom(&result);
     if(poly->head->coef == 0 && poly->head->power == 0){
-        add_monom(0, 0, &result);
-        return result;
+        check = add_monom(0, 0, &result);
+        if(check == memory_error){
+            return memory_error;
+        }
+        (*answer) = &result;
+        return success;
     }
     Monom *cur = poly->head;
     int new_coef = 0;
@@ -756,14 +691,19 @@ Polynom diff_poly(Polynom *poly){
     while(cur != NULL){
         new_coef = cur->coef*cur->power;
         new_power = cur->power - 1;
-        add_monom(new_coef, new_power, &result);
+        check = add_monom(new_coef, new_power, &result);
+        if(check == memory_error){
+            free_polynom(&result);
+            return memory_error;
+        }
         cur = cur->next;
     }
-    return result;
+    (*answer) = &result;
+    return success;
 }
 
 int eval_poly(Polynom *poly_1, Polynom *poly_2){
-    int result;
+    int result = 0;
     Monom *cur_1 = poly_1->head;
     int point = poly_2->head->coef;
     while(cur_1 != NULL){
@@ -773,14 +713,15 @@ int eval_poly(Polynom *poly_1, Polynom *poly_2){
     return result;
 }
 
-Polynom mod_poly(Polynom *poly_1, Polynom *poly_2){
+int mod_poly(Polynom *poly_1, Polynom *poly_2, Polynom **answer){
     if(poly_1->head->power < poly_2->head->power){
-        poly_1->error = 2;
-        return *poly_1;
+        (*answer) = poly_1;
+        return fail;
     }
     Polynom temp;
     Polynom temp_product;
     Polynom temp_sub;
+    Polynom *temp_2;
     int coef = 0;
     int power = 0;
     int check;
@@ -791,16 +732,29 @@ Polynom mod_poly(Polynom *poly_1, Polynom *poly_2){
         create_polynom(&temp);
         check = add_monom(coef, power, &temp);
         if(check == memory_error){
-            poly_1->error = 1;
-            return *poly_1;
+            return memory_error;
         }
 
         create_polynom(&temp_product);
-        temp_product = mult_poly(poly_2, &temp);
+        check = mult_poly(poly_2, &temp, &temp_2);
+        if(check == memory_error){
+            free_polynom(&temp_product);
+            free_polynom(&temp);
+            free_polynom(&temp_sub);
+            return memory_error;
+        }
+        temp_product = *temp_2;
         sort_poly(&temp_product);
  
         create_polynom(&temp_sub);
-        temp_sub = sub_poly(poly_1, &temp_product);
+        check = sub_poly(poly_1, &temp_product, &temp_2);
+        if(check == memory_error){
+            free_polynom(&temp_product);
+            free_polynom(&temp);
+            free_polynom(&temp_sub);
+            return memory_error;
+        }
+        temp_sub = *temp_2;
         free_polynom(poly_1);
         *poly_1 = copy_poly(&temp_sub);
         sort_poly(poly_1);
@@ -808,19 +762,20 @@ Polynom mod_poly(Polynom *poly_1, Polynom *poly_2){
         free_polynom(&temp);
     }
     combine_monoms(poly_1);
-    return *poly_1;
+    (*answer) = poly_1;
+    return success;
 }
 
-Polynom div_poly(Polynom *poly_1, Polynom *poly_2){
+int div_poly(Polynom *poly_1, Polynom *poly_2, Polynom **answer){
     Polynom result;
     create_polynom(&result);
     if(poly_1->head->power < poly_2->head->power){
-        result.error = 2;
-        return result;
+        return fail;
     }
     Polynom temp;
     Polynom temp_product;
     Polynom temp_sub;
+    Polynom *temp_2;
     int coef = 0;
     int power = 0;
     int check;
@@ -834,14 +789,33 @@ Polynom div_poly(Polynom *poly_1, Polynom *poly_2){
         create_polynom(&temp);
         check = add_monom(coef, power, &temp);
         if(check == memory_error){
-            result.error = 1;
-            return result;
+            free_polynom(&temp_product);
+            free_polynom(&temp);
+            free_polynom(&temp_sub);
+            free_polynom(&result);
+            return memory_error;
         }
         create_polynom(&temp_product);
-        temp_product = mult_poly(poly_2, &temp);
+        check = mult_poly(poly_2, &temp, &temp_2);
+        if(check == memory_error){
+            free_polynom(&temp_product);
+            free_polynom(&temp);
+            free_polynom(&temp_sub);
+            free_polynom(&result);
+            return memory_error;
+        }
+        temp_product = *temp_2;
         sort_poly(&temp_product);
         create_polynom(&temp_sub);
-        temp_sub = sub_poly(poly_1, &temp_product);
+        check = sub_poly(poly_1, &temp_product, &temp_2);
+        if(check == memory_error){
+            free_polynom(&temp_product);
+            free_polynom(&temp);
+            free_polynom(&temp_sub);
+            free_polynom(&result);
+            return memory_error;
+        }
+        temp_sub = *temp_2;
         add_monom(coef, power, &result);
 
         *poly_1 = copy_poly(&temp_sub);
@@ -851,7 +825,8 @@ Polynom div_poly(Polynom *poly_1, Polynom *poly_2){
     }
     free_polynom(&temp_sub);
     combine_monoms(&result);
-    return result;
+    (*answer) = &result;
+    return success;
 }
 
 void sort_poly(Polynom *poly){
@@ -874,7 +849,7 @@ void sort_poly(Polynom *poly){
     }
 }
 
-Polynom mult_poly(Polynom *poly_1, Polynom *poly_2){
+int mult_poly(Polynom *poly_1, Polynom *poly_2, Polynom **answer){
     Polynom result;
     create_polynom(&result);
 
@@ -889,15 +864,15 @@ Polynom mult_poly(Polynom *poly_1, Polynom *poly_2){
             new_power = cur_1->power + cur_2->power;
             check = add_monom(new_coef, new_power, &result);
             if(check == memory_error){
-                result.error = 1;
-                return result;
+                return memory_error;
             }
             cur_2 = cur_2->next;
         }
         cur_1 = cur_1->next;
     }
     combine_monoms(&result);
-    return result;
+    (*answer) = &result;
+    return success;
 }
 
 void combine_monoms(Polynom *poly){
@@ -921,43 +896,60 @@ void combine_monoms(Polynom *poly){
     }
 }
 
-Polynom sub_poly(Polynom *poly_1, Polynom *poly_2){
+int sub_poly(Polynom *poly_1, Polynom *poly_2, Polynom **answer){
     Polynom result;
     create_polynom(&result);
 
     Monom *cur_1 = poly_1->head;
     Monom *cur_2 = poly_2->head;
     int coef;
+    int check;
     while(cur_1 != NULL && cur_2 != NULL){
         if(cur_1->power > cur_2->power){
-            add_monom(cur_1->coef, cur_1->power, &result);
+            check = add_monom(cur_1->coef, cur_1->power, &result);
+            if(check == memory_error){
+                return memory_error;
+            }
             cur_1 = cur_1->next;
         }
         else if(cur_1->power < cur_2->power){
-            add_monom((-1)*cur_2->coef, cur_2->power, &result);
+            check = add_monom((-1)*cur_2->coef, cur_2->power, &result);
+            if(check == memory_error){
+                return memory_error;
+            }
             cur_2 = cur_2->next;
         }
         else if(cur_1->power == cur_2->power){
             coef = cur_1->coef - cur_2->coef;
             if(coef != 0){
-                add_monom(coef, cur_1->power, &result);
+                check = add_monom(coef, cur_1->power, &result);
+                if(check == memory_error){
+                    return memory_error;
+                }
             }
             cur_1 = cur_1->next;
             cur_2 = cur_2->next;
         }
     }
     while(cur_1 != NULL){
-        add_monom(cur_1->coef, cur_1->power, &result);
+        check = add_monom(cur_1->coef, cur_1->power, &result);
+        if(check == memory_error){
+            return memory_error;
+        }
         cur_1 = cur_1->next;
     }
     while(cur_2 != NULL){
-        add_monom((-1)*cur_2->coef, cur_2->power, &result);
+        check = add_monom((-1)*cur_2->coef, cur_2->power, &result);
+        if(check == memory_error){
+            return memory_error;
+        }
         cur_2 = cur_2->next;
     }
-    return result;
+    (*answer) = &result;
+    return success;
 }
 
-Polynom add_poly(Polynom *poly_1, Polynom *poly_2){
+int add_poly(Polynom *poly_1, Polynom *poly_2, Polynom **temp){
     Polynom result;
     create_polynom(&result);
 
@@ -968,24 +960,21 @@ Polynom add_poly(Polynom *poly_1, Polynom *poly_2){
         if(cur_1->power > cur_2->power){
             check = add_monom(cur_1->coef, cur_1->power, &result);
             if(check == memory_error){
-                result.error = 1;
-                return result;
+                return memory_error;
             }
             cur_1 = cur_1->next;
         }
         else if(cur_1->power < cur_2->power){
             check = add_monom(cur_2->coef, cur_2->power, &result);
             if(check == memory_error){
-                result.error = 1;
-                return result;
+                return memory_error;
             }
             cur_2 = cur_2->next;
         }
         else{
             check = add_monom(cur_1->coef + cur_2->coef, cur_1->power, &result);
             if(check == memory_error){
-                result.error = 1;
-                return result;
+                return memory_error;
             }
             cur_1 = cur_1->next;
             cur_2 = cur_2->next;
@@ -994,21 +983,20 @@ Polynom add_poly(Polynom *poly_1, Polynom *poly_2){
     while (cur_1 != NULL) {
         check = add_monom(cur_1->coef, cur_1->power, &result);
         if(check == memory_error){
-            result.error = 1;
-            return result;
+            return memory_error;
         }
         cur_1 = cur_1->next;
     }
     while (cur_2 != NULL) {
         check = add_monom(cur_2->coef, cur_2->power, &result);
         if(check == memory_error){
-            result.error = 1;
-            return result;
+            return memory_error;
         }
         cur_2 = cur_2->next;
     }
     combine_monoms(&result);
-    return result;
+    (*temp) = &result;
+    return success;
 }
 
 void print_poly(Polynom *poly){
