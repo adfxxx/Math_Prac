@@ -713,7 +713,6 @@ void write_to_file(const List *list, FILE *output){
 }
 
 int find_liver(const List *list, const char *name, const char *surname, const char *patronymic, int day, int month, int year, char gender, double salary, double eps, Liver **found){
-    Liver *error;
     if(list->head == NULL){
         return empty_list;
     }
