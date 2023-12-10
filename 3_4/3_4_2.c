@@ -48,8 +48,6 @@ typedef struct{
 }Post;
 
 int compare_package_time(const void *first, const void *second);
-int compare_packages_id(const void *first, const void *second);
-int compare_packages_index(const void *first, const void *second);
 Mail** get_delivered_packages(Post *post, int *count);
 void get_time(const char *delivery_time, struct tm *delivery_tm);
 int delete_package(Post *post, const char *input_id);
@@ -387,8 +385,6 @@ int main(){
             }  
             break;
         case 5:
-            qsort(post.packages, post.packages_number, sizeof(Mail), compare_packages_index);
-            qsort(post.packages, post.packages_number, sizeof(Mail), compare_packages_id);
             for(int i = 0; i < post.packages_number; i++){
                 printf("Information about package: \n");
                 printf("\tAddress: %s city, %s street, house %d, building %s, apartment %d, index %s\n", 
@@ -439,18 +435,6 @@ int compare_package_time(const void *first, const void *second){
     } else {
         return 0;
     }
-}
-
-int compare_packages_id(const void *first, const void *second){
-    Mail *mail_first = (Mail *)first;
-    Mail *mail_second = (Mail *)second;
-    return strcmp(mail_first->id.string, mail_second->id.string);
-}
-
-int compare_packages_index(const void *first, const void *second){
-    Mail *mail_first = (Mail *)first;
-    Mail *mail_second = (Mail *)second;
-    return strcmp(mail_first->address_client.index.string, mail_second->address_client.index.string);
 }
 
 Mail** get_delivered_packages(Post *post, int *count){
@@ -601,9 +585,6 @@ int add_package(Post *post, Address address_client, double weight, String id, St
     }
     post->packages[index] = new_mail;
 
-    delete(&id);
-    delete(&creation_time);
-    delete(&delivery_time);
     return success;
 }
 

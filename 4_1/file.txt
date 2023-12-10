@@ -1,9 +1,11 @@
 #define one two
 #define one three
 #define one four
+#define def #define
 #define mall reall
-#define puk hoook
 #define mak kam
 #define one one gggghjg hsjdg ,s,g.g. ;;\\       mall mall mak lkldkl definef ne
-puk puk pku mak fasdhjfkjaf     $$$$
+def def 12345
+abc abc abc mak fasdhjfkjaf     $$$$
 defdefef
+one

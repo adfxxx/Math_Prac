@@ -340,7 +340,7 @@ Node **get_n_words(Node *root, int number){
         return NULL;
     }
     for(int i = 0; i < number; i++){
-        words[i] = create_node("");;
+        words[i] = create_node("");
     }
     int count = 0;
     get_words(root, words, &count, number);
@@ -477,7 +477,7 @@ int total_words(Node *root){
 Node *create_node(char *word){
     Node *new_node = (Node*)malloc(sizeof(Node));
     if(new_node == NULL){
-        printf("!");
+        //printf("!");
         return NULL;
     }
     new_node->word = strdup(word);

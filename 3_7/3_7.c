@@ -773,9 +773,6 @@ int read_file(FILE *input, List *list){
 }
 
 void add_liver_to_list(List *list, Liver *new_liver){
-    // if(list == NULL || new_liver == NULL){
-    //     return;
-    // }
     Liver *cur = list->head;
     Liver *prev = NULL;
 

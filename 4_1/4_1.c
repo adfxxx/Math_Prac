@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
+#include <time.h>
 
 enum errors{
     same = 2,
@@ -43,7 +44,8 @@ int insert(Hash *table, int hash_func, char *macro, char *subst);
 int insert_to_chain(Elements *chain, int hash_func, char *macro, char *subst);
 Elem *find_in_chain(Elements *chain, char *macro);
 int hash_function(char *macro);
-int read_file(FILE *input, Hash *table);
+int read_file(FILE *input, char *input_name, Hash *table);
+char *get_file_name();
 int replace_words(Hash *table, char *line, FILE* output);
 Elem *find_in_table(Hash *table, char *macro);
 int check_macro(char *macro);
@@ -82,7 +84,7 @@ int main(int argc, char *argv[]){
         table.elements[i]->head = NULL;
         table.elements[i]->tail = NULL;
     }
-    int result = read_file(input, &table);
+    int result = read_file(input, argv[1], &table);
     if(result == memory_error){
         print(memory_error);
         fclose(input);
@@ -106,17 +108,6 @@ void free_table(Hash *table){
         free(table->elements[i]);
     }
     free(table->elements);
-}
-
-void printHashTable(Hash *table) {
-    for (int i = 0; i < table->size; i++) {
-        Elem *current = table->elements[i]->head;
-        while(current != NULL) {
-            printf("Bucket %d: ", i+1);
-            printf("(%s, %s)\n", current->macro, current->subst);
-            current = current->next;
-        }
-    }
 }
 
 int resize(Hash *table){
@@ -288,9 +279,18 @@ int hash_function(char *macro){
     return result;
 }
 
-int read_file(FILE *input, Hash *table){
-    FILE *output = fopen("output.txt", "w");
+int read_file(FILE *input, char *input_name, Hash *table){
+    char *output = get_file_name();
     if(!output){
+        return memory_error;
+    }
+    if(!strcmp(input_name, output)){
+        free(output);
+        return is_not_open_output;
+    }
+    FILE *out_file = fopen(output, "w");
+    free(output);
+    if(!out_file){
         return is_not_open_output;
     }
     char *line = NULL;
@@ -313,13 +313,7 @@ int read_file(FILE *input, Hash *table){
             free(macro);
             return memory_error;
         }
-        if(check_str(line) == success && flag != 0){
-            flag = 1;
-        }
-        else{
-            flag = 0;
-        }
-        if(flag){
+        if(!strncmp(line, "#define", 7)){
             i = 7;
             k = 0;
             while(line[i] == ' '){
@@ -335,7 +329,7 @@ int read_file(FILE *input, Hash *table){
                     if(temp == NULL){
                         free(macro);
                         free(subst);
-                        fclose(output);
+                        fclose(out_file);
                         free(line);
                         return memory_error;
                     }
@@ -361,7 +355,7 @@ int read_file(FILE *input, Hash *table){
                     if(temp == NULL){
                         free(macro);
                         free(subst);
-                        fclose(output);
+                        fclose(out_file);
                         free(line);
                         return memory_error;
                     }
@@ -374,13 +368,13 @@ int read_file(FILE *input, Hash *table){
             if(result == memory_error){
                 free(macro);
                 free(subst);
-                fclose(output);
+                fclose(out_file);
                 free(line);
                 return memory_error;
             }
             else if(result == chain_error){
                 free(macro);
-                fclose(output);
+                fclose(out_file);
                 free(line);
                 free(subst);
                 return chain_error;
@@ -389,18 +383,42 @@ int read_file(FILE *input, Hash *table){
             free(subst);
         }
         else{
-            result = replace_words(table, line, output);
+            result = replace_words(table, line, out_file);
             if(result == memory_error){
                 free(line);
-                fclose(output);
+                fclose(out_file);
                 return memory_error;
             }
         }
     }
-    fclose(output);
+    fclose(out_file);
     free(line);
     return success;
 }
+
+char *get_file_name(){
+    srand(time(NULL));
+    char *file_name = (char*)malloc(10*sizeof(char));
+    if(file_name == NULL){
+        return NULL;
+    }
+    int symbol;
+    for(int i = 0; i < 6; i++){
+        symbol = rand() % 36;
+        if(symbol < 26){
+            file_name[i] = 'A' + symbol;
+        }
+        else{
+            file_name[i] = '0' + (symbol - 26);
+        }
+    }
+    file_name[6] = '.';
+    file_name[7] = 't';
+    file_name[8] = 'x';
+    file_name[9] = 't';
+    file_name[10] = '\0';
+    return file_name;
+ }
 
 int replace_words(Hash *table, char *line, FILE* output){
     int i = 0;
@@ -510,5 +528,16 @@ void print(int state){
     }
     else if(state == is_not_open_output){
         printf("Output file is not open.\n");
+    }
+}
+
+void printHashTable(Hash *table) {
+    for (int i = 0; i < table->size; i++) {
+        Elem *current = table->elements[i]->head;
+        while(current != NULL) {
+            printf("Bucket %d: ", i+1);
+            printf("(%s, %s)\n", current->macro, current->subst);
+            current = current->next;
+        }
     }
 }
