@@ -28,7 +28,6 @@ void free_node(Node *node);
 int write_to_file(FILE *output, Node *root, char *separator, int flag);
 int get_tree_depth(Node *root);
 int get_long_short_word(Node *root, char **long_word, char **short_word);
-Node **get_n_words(Node *root, int number);
 void get_words(Node *root, Node **words, int *count, int number);
 int find_word(Node *root, char *word);
 int change_command(Node *root, char *separator);
@@ -89,6 +88,7 @@ int main(int argc, char *argv[]){
 
 int change_command(Node *root, char *separator){
     int option = 0;
+    int length = total_words(root);
     int number;
     Node **words;
     while(option != 7){
@@ -145,19 +145,23 @@ int change_command(Node *root, char *separator){
             case 2:
             fflush(stdin);
             printf("Enter a number of words to show: ");
-            if(!scanf("%d", &number) || number > total_words(root)){
+            if(!scanf("%d", &number) || number > length){
                 print(wrong_input);
                 break;
             }
-            words = get_n_words(root, number);
+            int count = 0;
+            words = (Node**)malloc(number*sizeof(Node*));
             if(words == NULL){
                 return memory_error;
             }
+            for(int i = 0; i < number; i++){
+                words[i] = NULL;
+            }
+            get_words(root, words, &count, number);
             printf("\nTop %d the most frequent words:\n", number);
             for(int i = 0; i < number; i++){
                 printf("%d. %s\n", i+1, words[i]->word);
             }
-
             print(after_function);
             fflush(stdin);
             if(!scanf("%d", &option) || option < 1 || option > 2){
@@ -258,6 +262,11 @@ int change_command(Node *root, char *separator){
             fclose(output);
             check = read_file(output, separator, &root);
             if(check == memory_error){
+                for(int i = 0; i < number; i++){
+                    free(words[i]);
+                    words[i] = NULL;
+                }
+                free(words);
                 return memory_error;
             }
 
@@ -279,6 +288,11 @@ int change_command(Node *root, char *separator){
             break;
         }
     }
+    for(int i = 0; i < number; i++){
+        free(words[i]);
+        words[i] = NULL;
+    }
+    free(words);
     return success;
 }
 
@@ -334,38 +348,37 @@ int get_long_short_word(Node *root, char **long_word, char **short_word){
     get_long_short_word(root->right, long_word, short_word);
 }
 
-Node **get_n_words(Node *root, int number){
-    Node **words = (Node**)malloc(number*sizeof(Node*));
-    if(words == NULL){
-        return NULL;
-    }
-    for(int i = 0; i < number; i++){
-        words[i] = create_node("");
-    }
-    int count = 0;
-    get_words(root, words, &count, number);
-
-    return words;
-}
-
 void get_words(Node *root, Node **words, int *count, int number){
-    if(root != NULL && *count < number){
-        get_words(root->right, words, count, number);
-
-        if(*count < number || root->count > words[number - 1]->count){
-            int index;
-            for(index = *count - 1; index >= 0 && root->count > words[index]->count; index--){
-                words[index + 1] = words[index];
-            }
-            words[index + 1] = root;
-
-            if(*count < number){
+    if(root != NULL){
+        for(int i = 0; i < number; i++){
+            if(words[i] == NULL){
+                words[i] = root;
                 (*count)++;
+                break;
+            }
+            else if(words[i]->count <= root->count){
+                if(*count < number){
+                    for(int j = *count; j > i; j--){
+                        words[j] = words[j-1];
+                    }
+                    words[i] = root;
+                    (*count)++;
+                    break;
+                }
+                else{
+                    for(int j = number - 1; j > i; j--){
+                        words[j] = words[j-1];
+                    }
+                    words[i] = root;
+                    break;
+                }
             }
         }
         get_words(root->left, words, count, number);
+        get_words(root->right, words, count, number);
     }
 }
+
 
 int find_word(Node *root, char *word){
     int compare;
@@ -414,7 +427,6 @@ int read_file(FILE *input, char *separator, Node **root){
         else{
             if(index > 0){
                 word[index] = '\0';
-                printf("%s\n", word);
                 *root = insert(*root, word);
                 if(*root == NULL){
                     free(word);
