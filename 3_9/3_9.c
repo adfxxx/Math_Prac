@@ -259,7 +259,12 @@ int change_command(Node *root, char *separator){
             }
             write_to_file(output, root, separator, 1);
             printf("\nSuccessful writing to the file.\n");
-            fclose(output);
+            output = fopen("output.txt", "r");
+            if(!output){
+                print(is_not_open_output);
+                break;
+            }
+            rewind(output);
             check = read_file(output, separator, &root);
             if(check == memory_error){
                 for(int i = 0; i < number; i++){
@@ -267,9 +272,10 @@ int change_command(Node *root, char *separator){
                     words[i] = NULL;
                 }
                 free(words);
+                fclose(output);
                 return memory_error;
             }
-
+            fclose(output);
             print(after_function);
             fflush(stdin);
             if(!scanf("%d", &option) || option < 1 || option > 2){
@@ -489,7 +495,6 @@ int total_words(Node *root){
 Node *create_node(char *word){
     Node *new_node = (Node*)malloc(sizeof(Node));
     if(new_node == NULL){
-        //printf("!");
         return NULL;
     }
     new_node->word = strdup(word);
