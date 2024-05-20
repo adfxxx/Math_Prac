@@ -1,0 +1,15 @@
+[2024-05-10T11:06:06] [NEW_REQUEST]: new request in system; request id - 6, department id - 1.
+[2024-05-10T11:06:06] [NEW_REQUEST]: new request in system; request id - 1, department id - 3.
+[2024-05-10T11:06:06] [REQUEST_HANDLING_STARTED]: started handling a request; request id - 6, operator's name - 54CRJ39HASFXSL.
+[2024-05-10T11:06:06] [REQUEST_HANDLING_STARTED]: started handling a request; request id - 1, operator's name - 52C5.
+[2024-05-10T11:08:06] [NEW_REQUEST]: new request in system; request id - 4, department id - 3.
+[2024-05-10T11:08:06] [REQUEST_HANDLING_STARTED]: started handling a request; request id - 4, operator's name - 5108K3ZO.
+[2024-05-10T11:09:06] [REQUEST_HANDLING_FINISHED]: finished handling a request; request id - 6, handling time - 3, operator's name - 54CRJ39HASFXSL.
+[2024-05-10T11:09:06] [REQUEST_HANDLING_FINISHED]: finished handling a request; request id - 1, handling time - 3, operator's name - 52C5.
+[2024-05-10T11:10:06] [REQUEST_HANDLING_FINISHED]: finished handling a request; request id - 4, handling time - 2, operator's name - 5108K3ZO.
+[2024-05-10T11:16:06] [NEW_REQUEST]: new request in system; request id - 2, department id - 2.
+[2024-05-10T11:16:06] [REQUEST_HANDLING_STARTED]: started handling a request; request id - 2, operator's name - CXS9Q.
+[2024-05-10T11:17:06] [REQUEST_HANDLING_FINISHED]: finished handling a request; request id - 2, handling time - 1, operator's name - CXS9Q.
+[2024-05-10T11:26:06] [NEW_REQUEST]: new request in system; request id - 3, department id - 3.
+[2024-05-10T11:26:06] [REQUEST_HANDLING_STARTED]: started handling a request; request id - 3, operator's name - IYGDPR.
+[2024-05-10T11:30:06] [REQUEST_HANDLING_FINISHED]: finished handling a request; request id - 3, handling time - 4, operator's name - IYGDPR.
