@@ -1,0 +1,12 @@
+right= #asdfasf
+()op add
+add sum
+# div /
+[div /
+div /]
+rem %
+xor <>
+xor ><
+input in
+output print
+= ->
